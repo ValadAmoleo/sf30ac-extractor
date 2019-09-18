@@ -17,16 +17,13 @@ def split_code_file(dst_dir, dst_names, src_path, size):
         print(src_path)
         for (dst_even_name, dst_odd_name) in dst_names:
             print("\t" + dst_even_name + ", " + dst_odd_name)
-            contents = src.read(size * 2)
             dst_even_path = os.path.join(dst_dir, dst_even_name)
             dst_odd_path = os.path.join(dst_dir, dst_odd_name)
             with open(dst_even_path, "wb") as dst_even:
                 with open(dst_odd_path, "wb") as dst_odd:
                     for i in range(size):
-                        even = contents[i * 2]
-                        odd = contents[i * 2 + 1]
-                        dst_even.write(even)
-                        dst_odd.write(odd)
+                        dst_even.write(src.read(1))
+                        dst_odd.write(src.read(1))
 
 
 def split_gfx_file(dst_dir, dst_names, src_path, size):
@@ -42,7 +39,7 @@ def split_gfx_file(dst_dir, dst_names, src_path, size):
                 with open(dst_path_2, "wb") as dst_2:
                     with open(dst_path_3, "wb") as dst_3:
                         with open(dst_path_4, "wb") as dst_4:
-                            for i in range(size / 2):
+                            for i in range(size // 2):
                                 dst_1.write(src.read(2))
                                 dst_2.write(src.read(2))
                                 dst_3.write(src.read(2))
