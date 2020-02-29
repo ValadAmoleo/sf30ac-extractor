@@ -93,15 +93,21 @@ def split_game(dst_game_name, src_game_name, code_files, gfx_files, split_files,
     dst_dir = os.path.join(root_dir, dst_game_name)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
-    for (dst_names, src_ext, size) in code_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_code_file(dst_dir, dst_names, src_path, size)
-    for (dst_names, src_ext, size) in gfx_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size, type)
-    for (dst_names, src_ext, size) in split_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+    if type == "cps3":
+        print("Splitting CPS3 Files")
+        for (dst_names, src_ext, size) in split_files:
+            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            split_file(dst_dir, dst_names, src_path, size)
+    else:
+        for (dst_names, src_ext, size) in code_files:
+            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            split_code_file(dst_dir, dst_names, src_path, size)
+        for (dst_names, src_ext, size) in gfx_files:
+            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            split_gfx_file(dst_dir, dst_names, src_path, size, type)
+        for (dst_names, src_ext, size) in split_files:
+            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            split_file(dst_dir, dst_names, src_path, size)
 
 
 sf2_code = [(
@@ -130,4 +136,34 @@ sf2_files = [
     (["sf2_18.11c", "sf2_19.12c"], "oki", 128 * 1024),
 ]
 
+sfiii_files = [
+    (["sfiii-simm1.0", "sfiii-simm1.1", "sfiii-simm1.2", "sfiii-simm1.3"], "s1", 2097152),
+    (["sfiii-simm3.0", "sfiii-simm3.1", "sfiii-simm3.2", "sfiii-simm3.3", "sfiii-simm3.4", "sfiii-simm3.5", "sfiii-simm3.6", "sfiii-simm3.7"], "s3", 2097152),
+    (["sfiii-simm4.0", "sfiii-simm4.1", "sfiii-simm4.2", "sfiii-simm4.3", "sfiii-simm4.4", "sfiii-simm4.5", "sfiii-simm4.6", "sfiii-simm4.7"], "s4", 2097152),
+    (["sfiii-simm5.0", "sfiii-simm5.1", "sfiii-simm5.2", "sfiii-simm5.3", "sfiii-simm5.4", "sfiii-simm5.5", "sfiii-simm5.6", "sfiii-simm5.7"], "s5", 2097152),
+    (["sfiii_euro.29f400.u2"], "bios", 512 * 1024)
+]
+
+sfiii2_files = [
+    (["sfiii2-simm1.0", "sfiii2-simm1.1", "sfiii2-simm1.2", "sfiii2-simm1.3"], "s1", 2097152),
+    (["sfiii2-simm2.0", "sfiii2-simm2.1", "sfiii2-simm2.2", "sfiii2-simm2.3"], "s2", 2097152),
+    (["sfiii2-simm3.0", "sfiii2-simm3.1", "sfiii2-simm3.2", "sfiii2-simm3.3", "sfiii2-simm3.4", "sfiii2-simm3.5", "sfiii2-simm3.6", "sfiii2-simm3.7"], "s3", 2097152),
+    (["sfiii2-simm4.0", "sfiii2-simm4.1", "sfiii2-simm4.2", "sfiii2-simm4.3", "sfiii2-simm4.4", "sfiii2-simm4.5", "sfiii2-simm4.6", "sfiii2-simm4.7"], "s4", 2097152),
+    (["sfiii2-simm5.0", "sfiii2-simm5.1", "sfiii2-simm5.2", "sfiii2-simm5.3", "sfiii2-simm5.4", "sfiii2-simm5.5", "sfiii2-simm5.6", "sfiii2-simm5.7"], "s5", 2097152),
+    (["sfiii2_usa.29f400.u2"], "bios", 512 * 1024)
+]
+
+sfiii3_files = [
+    (["sfiii3-simm1.0", "sfiii3-simm1.1", "sfiii3-simm1.2", "sfiii3-simm1.3"], "r1.s1", 2097152),
+    (["sfiii3-simm2.0", "sfiii3-simm2.1", "sfiii3-simm2.2", "sfiii3-simm2.3"], "r1.s2", 2097152),
+    (["sfiii3-simm3.0", "sfiii3-simm3.1", "sfiii3-simm3.2", "sfiii3-simm3.3", "sfiii3-simm3.4", "sfiii3-simm3.5", "sfiii3-simm3.6", "sfiii3-simm3.7"], "s3", 2097152),
+    (["sfiii3-simm4.0", "sfiii3-simm4.1", "sfiii3-simm4.2", "sfiii3-simm4.3", "sfiii3-simm4.4", "sfiii3-simm4.5", "sfiii3-simm4.6", "sfiii3-simm4.7"], "s4", 2097152),
+    (["sfiii3-simm5.0", "sfiii3-simm5.1", "sfiii3-simm5.2", "sfiii3-simm5.3", "sfiii3-simm5.4", "sfiii3-simm5.5", "sfiii3-simm5.6", "sfiii3-simm5.7"], "s5", 2097152),
+    (["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], "s6", 2097152),
+    (["sfiii3_euro.29f400.u2"], "bios", 512 * 1024)
+]
+
 split_game("sf2ua", "StreetFighterII", sf2_code, sf2_gfx, sf2_files, "cps1")
+split_game("sfiii", "StreetFighterIII", None, None, sfiii_files, "cps3")
+split_game("sfiii2", "StreetFighterIII_2ndImpact", None, None, sfiii2_files, "cps3")
+split_game("sfiii3", "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
