@@ -26,9 +26,35 @@ def split_code_file(dst_dir, dst_names, src_path, size):
                         dst_odd.write(src.read(1))
 
 
-def split_gfx_file(dst_dir, dst_names, src_path, size):
+def decode_cps1_gfx(data):
+    buf = bytearray(data)
+    for i in range(0, len(buf), 4):
+        dwval = 0
+        src = buf[i] + (buf[i + 1] << 8) + (buf[i + 2] << 16) + (buf[i + 3] << 24)
+
+        for j in range(8):
+            n = src >> (j * 4) & 0x0f
+            if (n & 0x01):
+                dwval |= 1 << (     7 - j)
+            if (n & 0x02):
+                dwval |= 1 << ( 8 + 7 - j)
+            if (n & 0x04):
+                dwval |= 1 << (16 + 7 - j)
+            if (n & 0x08):
+                dwval |= 1 << (24 + 7 - j)
+
+        buf[i + 0] = (dwval)       & 0xff
+        buf[i + 1] = (dwval >>  8) & 0xff
+        buf[i + 2] = (dwval >> 16) & 0xff
+        buf[i + 3] = (dwval >> 24) & 0xff
+    return buf
+
+
+def split_gfx_file(dst_dir, dst_names, src_path, size, type):
     with open(src_path, "rb") as src:
         print(src_path)
+        if type == "cps1":
+            print("Decoding CPS1 Graphics")
         for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in dst_names:
             print("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
             dst_path_1 = os.path.join(dst_dir, dst_name_1)
@@ -40,11 +66,17 @@ def split_gfx_file(dst_dir, dst_names, src_path, size):
                     with open(dst_path_3, "wb") as dst_3:
                         with open(dst_path_4, "wb") as dst_4:
                             for i in range(size // 2):
-                                dst_1.write(src.read(2))
-                                dst_2.write(src.read(2))
-                                dst_3.write(src.read(2))
-                                dst_4.write(src.read(2))
-
+                                if type == "cps1":
+                                    data = decode_cps1_gfx(src.read(8))
+                                    dst_1.write(data[0:2])
+                                    dst_2.write(data[2:4])
+                                    dst_3.write(data[4:6])
+                                    dst_4.write(data[6:8])
+                                else:
+                                    dst_1.write(src.read(2))
+                                    dst_2.write(src.read(2))
+                                    dst_3.write(src.read(2))
+                                    dst_4.write(src.read(2))
 
 def split_file(dst_dir, dst_names, src_path, size):
     with open(src_path, "rb") as src:
@@ -57,7 +89,7 @@ def split_file(dst_dir, dst_names, src_path, size):
                 dst.write(contents)
 
 
-def split_game(dst_game_name, src_game_name, code_files, gfx_files, split_files):
+def split_game(dst_game_name, src_game_name, code_files, gfx_files, split_files, type):
     dst_dir = os.path.join(root_dir, dst_game_name)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
@@ -66,7 +98,7 @@ def split_game(dst_game_name, src_game_name, code_files, gfx_files, split_files)
         split_code_file(dst_dir, dst_names, src_path, size)
     for (dst_names, src_ext, size) in gfx_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size)
+        split_gfx_file(dst_dir, dst_names, src_path, size, type)
     for (dst_names, src_ext, size) in split_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_file(dst_dir, dst_names, src_path, size)
@@ -98,4 +130,4 @@ sf2_files = [
     (["sf2_18.11c", "sf2_19.12c"], "oki", 128 * 1024),
 ]
 
-split_game("sf2ub", "StreetFighterII", sf2_code, sf2_gfx, sf2_files)
+split_game("sf2ua", "StreetFighterII", sf2_code, sf2_gfx, sf2_files, "cps1")
