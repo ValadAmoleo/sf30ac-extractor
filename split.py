@@ -160,10 +160,10 @@ sfiii3_files = [
     (["sfiii3-simm4.0", "sfiii3-simm4.1", "sfiii3-simm4.2", "sfiii3-simm4.3", "sfiii3-simm4.4", "sfiii3-simm4.5", "sfiii3-simm4.6", "sfiii3-simm4.7"], "s4", 2097152),
     (["sfiii3-simm5.0", "sfiii3-simm5.1", "sfiii3-simm5.2", "sfiii3-simm5.3", "sfiii3-simm5.4", "sfiii3-simm5.5", "sfiii3-simm5.6", "sfiii3-simm5.7"], "s5", 2097152),
     (["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], "s6", 2097152),
-    (["sfiii3_euro.29f400.u2"], "bios", 512 * 1024)
+    (["sfiii3_usa.29f400.u2"], "bios", 512 * 1024)
 ]
 
 split_game("sf2ua", "StreetFighterII", sf2_code, sf2_gfx, sf2_files, "cps1")
 split_game("sfiii", "StreetFighterIII", None, None, sfiii_files, "cps3")
 split_game("sfiii2", "StreetFighterIII_2ndImpact", None, None, sfiii2_files, "cps3")
-split_game("sfiii3", "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
+split_game("sfiii3ur1", "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
