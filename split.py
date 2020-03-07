@@ -166,4 +166,4 @@ sfiii3_files = [
 split_game("sf2ua", "StreetFighterII", sf2_code, sf2_gfx, sf2_files, "cps1")
 split_game("sfiii", "StreetFighterIII", None, None, sfiii_files, "cps3")
 split_game("sfiii2", "StreetFighterIII_2ndImpact", None, None, sfiii2_files, "cps3")
-split_game("sfiii3ur1", "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
+split_game("sfiii3nr1", "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
