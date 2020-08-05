@@ -71,9 +71,9 @@ sf2ub_files = [
 #files (audiocpu-z80, samples-oki)
 sf2ceua_code = [(
     [
-        ("s92u_23a.8f"),
-        ("s92_22a.7f"),
-        ("s92_21a.6f")
+        ("s92u-23a"),
+        ("sf2ce.22"),
+        ("s92_21a.bin")
     ],
     "ua.68k",
     512 * 1024
@@ -82,9 +82,9 @@ sf2ceua_code = [(
 
 sf2ceua_gfx = [(
     [
-        ("s92-1m.3a", "s92-3m.5a", "s92-2m.4a", "s92-4m.6a"),
-        ("s92-5m.7a", "s92-7m.9a", "s92-6m.8a", "s92-8m.10a"),
-        ("s92-10m.3c", "s92-12m.5c", "s92-11m.4c", "s92-13m.6c")
+        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
+        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
+        ("s92_10.bin", "s92_11.bin", "s92_12.bin", "s92_13.bin")
     ],
     "vrom",
     512 * 1024
@@ -92,8 +92,8 @@ sf2ceua_gfx = [(
 #bank size is 0x80000
 
 sf2ceua_files = [
-    (["s92_09.11a"], "z80", 64 * 1024),
-    (["s92_18.11c", "s92_19.12c"], "oki", 128 * 1024),
+    (["s92_09.bin"], "z80", 64 * 1024),
+    (["s92_18.bin", "s92_19.bin"], "oki", 128 * 1024),
 ]
 
 ##################################################################################################################
@@ -101,31 +101,31 @@ sf2ceua_files = [
 #code (maincpu-ua.68k)
 #gfx (vrom)
 #files (audiocpu-z80, samples-oki)
-sf2hf_code = [(
+sf2t_code = [(
     [
-        ("s2te_23.8f"),
-        ("s2te_22.7f"),
-        ("s2te_21.6f")
+        ("sf2_23"),
+        ("sf2_22.bin"),
+        ("sf2_21.bin")
     ],
     "u.68k",
     512 * 1024
 )]
 #bank size is 0x80000
 
-sf2hf_gfx = [(
+sf2t_gfx = [(
     [
-        ("s92-1m.3a", "s92-3m.5a", "s92-2m.4a", "s92-4m.6a"),
-        ("s92-5m.7a", "s92-7m.9a", "s92-6m.8a", "s92-8m.10a"),
-        ("s92-10m.3c", "s92-12m.5c", "s92-11m.4c", "s92-13m.6c")
+        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
+        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
+        ("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")
     ],
     "u.vrom",
     512 * 1024
 )]
 #bank size is 0x80000
 
-sf2hf_files = [
-    (["s92_09.11a"], "z80", 64 * 1024),
-    (["s92_18.11c", "s92_19.12c"], "oki", 128 * 1024),
+sf2t_files = [
+    (["s92_09.bin"], "z80", 64 * 1024),
+    (["s92_18.bin", "s92_19.bin"], "oki", 128 * 1024),
 ]
 
 ##################################################################################################################
@@ -348,7 +348,7 @@ def split_game(root_dir, rom_dir, rom_name, src_game_name, code_files, split_fil
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_file(dst_dir, dst_names, src_path, size)
 
-#sf2eb,sfiiina,sfiii2n,sfiii3nr1
+#sf2ub,sfiiina,sfiii2n,sfiii3nr1
 def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
     dst_dir = os.path.join(rom_dir, rom_name)
     if not os.path.exists(dst_dir):
@@ -444,12 +444,12 @@ def main(argc, argv):
     elif rom_name=="sf2ceua":
         split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1")
         zip_game(rom_dir, rom_name)
-    elif rom_name=="sf2hf":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2hf_code, sf2hf_gfx, sf2hf_files, "cps1")
+    elif rom_name=="sf2t":
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1")
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2u":
-        gfx2_offset=0x800000
-        split_game_alt2(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps1")
+        #gfx2_offset=0x800000
+        split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2tu":
         print("Unsupported rom="+rom_name)
