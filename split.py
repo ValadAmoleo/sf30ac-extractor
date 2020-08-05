@@ -5,6 +5,7 @@ from zipfile import ZipFile
 
 def usage():
     print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" \"RomName\"")
+    print("RomName should be from: sf, sf2ub, sf2ceua, sf2t, ..., ..., ..., ..., ..., sfiiina, sfiii2n, sfiii3nr1")
     sys.exit(0)
 
 ##################################################################################################################
@@ -163,15 +164,15 @@ ssf2u_files = [
 ]
 
 ##################################################################################################################
-sfiii_files = [
+sfiiina_files = [
     (["sfiii-simm1.0", "sfiii-simm1.1", "sfiii-simm1.2", "sfiii-simm1.3"], "s1", 2097152),
     (["sfiii-simm3.0", "sfiii-simm3.1", "sfiii-simm3.2", "sfiii-simm3.3", "sfiii-simm3.4", "sfiii-simm3.5", "sfiii-simm3.6", "sfiii-simm3.7"], "s3", 2097152),
     (["sfiii-simm4.0", "sfiii-simm4.1", "sfiii-simm4.2", "sfiii-simm4.3", "sfiii-simm4.4", "sfiii-simm4.5", "sfiii-simm4.6", "sfiii-simm4.7"], "s4", 2097152),
-    (["sfiii-simm5.0", "sfiii-simm5.1", "sfiii-simm5.2", "sfiii-simm5.3", "sfiii-simm5.4", "sfiii-simm5.5", "sfiii-simm5.6", "sfiii-simm5.7"], "s5", 2097152),
+    (["sfiii-simm5.0", "sfiii-simm5.1"], "s5", 2097152),
     (["sfiii_euro.29f400.u2"], "bios", 512 * 1024)
 ]
 
-sfiii2_files = [
+sfiii2n_files = [
     (["sfiii2-simm1.0", "sfiii2-simm1.1", "sfiii2-simm1.2", "sfiii2-simm1.3"], "s1", 2097152),
     (["sfiii2-simm2.0", "sfiii2-simm2.1", "sfiii2-simm2.2", "sfiii2-simm2.3"], "s2", 2097152),
     (["sfiii2-simm3.0", "sfiii2-simm3.1", "sfiii2-simm3.2", "sfiii2-simm3.3", "sfiii2-simm3.4", "sfiii2-simm3.5", "sfiii2-simm3.6", "sfiii2-simm3.7"], "s3", 2097152),
@@ -180,7 +181,7 @@ sfiii2_files = [
     (["sfiii2_usa.29f400.u2"], "bios", 512 * 1024)
 ]
 
-sfiii3_files = [
+sfiii3nr1_files = [
     (["sfiii3-simm1.0", "sfiii3-simm1.1", "sfiii3-simm1.2", "sfiii3-simm1.3"], "r1.s1", 2097152),
     (["sfiii3-simm2.0", "sfiii3-simm2.1", "sfiii3-simm2.2", "sfiii3-simm2.3"], "r1.s2", 2097152),
     (["sfiii3-simm3.0", "sfiii3-simm3.1", "sfiii3-simm3.2", "sfiii3-simm3.3", "sfiii3-simm3.4", "sfiii3-simm3.5", "sfiii3-simm3.6", "sfiii3-simm3.7"], "s3", 2097152),
@@ -442,10 +443,10 @@ def main(argc, argv):
         split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ceua":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1")
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2t":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1")
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2u":
         #gfx2_offset=0x800000
@@ -459,14 +460,14 @@ def main(argc, argv):
         print("Unsupported rom="+rom_name)
     elif rom_name=="sfa3u":
         print("Unsupported rom="+rom_name)
-    elif rom_name=="sfiiiu":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiii_files, "cps3")
+    elif rom_name=="sfiiina":
+        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
         zip_game(rom_dir, rom_name)
-    elif rom_name=="sfiii2":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2_files, "cps3")
+    elif rom_name=="sfiii2n":
+        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2n_files, "cps3") # FB Neo
         zip_game(rom_dir, rom_name)
-    elif rom_name=="sfiii3ur1":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3_files, "cps3")
+    elif rom_name=="sfiii3nr1":
+        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3nr1_files, "cps3") # FB Neo
         zip_game(rom_dir, rom_name)
     else:
         print("Unsupported rom="+rom_name)
