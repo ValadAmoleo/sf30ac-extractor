@@ -39,10 +39,10 @@ sf_files = [
 #files (audiocpu-z80, samples-oki)
 sf2ub_code = [(
     [
-        ("sf2u_30b.11e", "sf2u_37b.11f"),
-        ("sf2u_31b.12e", "sf2u_38b.12f"),
-        ("sf2u_28b.9e", "sf2u_35b.9f"),
-        ("sf2_29b.10e", "sf2_36b.10f")
+        ("sf2u.30e", "sf2u.37e"),
+        ("sf2u.31e", "sf2u.38e"),
+        ("sf2u.28e", "sf2u.35e"),
+        ("sf2.29a", "sf2.36a")
     ],
     "ub.68k",
     128 * 1024
@@ -50,9 +50,9 @@ sf2ub_code = [(
 
 sf2ub_gfx = [(
     [
-        ("sf2-5m.4a", "sf2-7m.6a", "sf2-1m.3a", "sf2-3m.5a"),
-        ("sf2-6m.4c", "sf2-8m.6c", "sf2-2m.3c", "sf2-4m.5c"),
-        ("sf2-13m.4d", "sf2-15m.6d", "sf2-9m.3d", "sf2-11m.5d")
+        ("sf2_06.bin", "sf2_08.bin", "sf2_05.bin", "sf2_07.bin"),
+        ("sf2_15.bin", "sf2_17.bin", "sf2_14.bin", "sf2_16.bin"),
+        ("sf2_25.bin", "sf2_27.bin", "sf2_24.bin", "sf2_26.bin")
     ],
     "vrom",
     512 * 1024
@@ -60,8 +60,8 @@ sf2ub_gfx = [(
 #bank size is 0x80000
 
 sf2ub_files = [
-    (["sf2_9.12a"], "z80", 64 * 1024),
-    (["sf2_18.11c", "sf2_19.12c"], "oki", 128 * 1024),
+    (["sf2_09.bin"], "z80", 64 * 1024),
+    (["sf2_18.bin", "sf2_19.bin"], "oki", 128 * 1024),
 ]
 
 ##################################################################################################################
@@ -348,7 +348,7 @@ def split_game(root_dir, rom_dir, rom_name, src_game_name, code_files, split_fil
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_file(dst_dir, dst_names, src_path, size)
 
-#sf2ub,sfiiina,sfiii2n,sfiii3nr1
+#sf2eb,sfiiina,sfiii2n,sfiii3nr1
 def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
     dst_dir = os.path.join(rom_dir, rom_name)
     if not os.path.exists(dst_dir):
@@ -439,7 +439,7 @@ def main(argc, argv):
         split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ub":
-        split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1")
+        split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ceua":
         split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1")
@@ -470,6 +470,8 @@ def main(argc, argv):
         zip_game(rom_dir, rom_name)
     else:
         print("Unsupported rom="+rom_name)
+
+    print("Finished")
 
     exit(0)
 
