@@ -210,9 +210,8 @@ def zip_game(rom_dir, rom_name):
         for filename in filenames:
             # Add file to zip
             zipfileLocation=(zipdir+'/'+filename)
-            print(filename)
             zipObj.write(zipfileLocation, filename)
-            print('Added '+filename+' to '+zipname)
+    print(rom_name + " has been zipped to " +zipname)
 
 def rm_dir(dir):
     for folderName, subfolders, filenames in os.walk(dir):
@@ -501,15 +500,12 @@ def main(argc, argv):
 	
     if rom_name == None or rom_name == "all" :
         print("No --rom argument passed.  Extracting all available.")
-        process_rom(root_dir, rom_dir, "sf", conversion_type)
-        process_rom(root_dir, rom_dir, "sf2ub", conversion_type)
-        process_rom(root_dir, rom_dir, "sf2ceua", conversion_type)
-        process_rom(root_dir, rom_dir, "sf2t", conversion_type)
-        process_rom(root_dir, rom_dir, "sfiiina", conversion_type)
-        process_rom(root_dir, rom_dir, "sfiii2n", conversion_type)
-        process_rom(root_dir, rom_dir, "sfiii3nr1", conversion_type)
-    else :	
-        process_rom(root_dir, rom_dir, rom_name, conversion_type)
+        rom_name = "sf,sf2ub,sf2ceua,sf2t,sfiiina,sfiii2n,sfiii3nr1"
+       
+    rom_name.replace(" ", "")
+    required_roms = rom_name.split(",")
+    for individual_rom_name in required_roms:
+        process_rom(root_dir, rom_dir, individual_rom_name, conversion_type)
 
     print("Finished")
 
