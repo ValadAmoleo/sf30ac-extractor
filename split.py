@@ -4,9 +4,10 @@ import argparse
 from zipfile import ZipFile
 
 def usage():
-    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\"")
+    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"ConversionType\"")
     print("RomName should be from: sf, sf2ub, sf2ceua, sf2t, ..., ..., ..., ..., ..., sfiiina, sfiii2n, sfiii3nr1")
-    print("If you do not include --rom, all currently extractable roms will be extracted")
+    print("If you do not include --rom, all currently extractable roms will be extracted.")
+    print("ConversionType can be a1up or sf30th.  If you do not include this, sf30th will be used.")
     sys.exit(0)
 
 ##################################################################################################################
@@ -89,6 +90,15 @@ sf2ceua_gfx = [(
         ("s92_10.bin", "s92_11.bin", "s92_12.bin", "s92_13.bin")
     ],
     "vrom",
+    512 * 1024
+)]
+sf2ceua_gfx_a1up = [(
+    [
+        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
+        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
+        ("s92_10.bin", "s92_11.bin", "s92_12.bin", "s92_13.bin")
+    ],
+    "patch.vrom",
     512 * 1024
 )]
 #bank size is 0x80000
@@ -403,7 +413,7 @@ def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_file(dst_dir, dst_names, src_path, size)
 
-def ProcessRom(root_dir, rom_dir, rom_name):
+def ProcessRom(root_dir, rom_dir, rom_name, conversion_type):
 	#create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
@@ -423,19 +433,18 @@ def ProcessRom(root_dir, rom_dir, rom_name):
         split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
     elif rom_name=="sf2ub":
         split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ceua":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        zip_game(rom_dir, rom_name)
+        gfxFile = sf2ceua_gfx;
+        if conversion_type == "a1up" or conversion_type == "arcade1up" :
+            gfxFile = sf2ceua_gfx_a1up
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, gfxFile, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
     elif rom_name=="sf2t":
         split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2u":
         print("Unsupported rom="+rom_name)
         return
         #gfx2_offset=0x800000
         split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
-        zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2tu":
         print("Unsupported rom="+rom_name)
         return
@@ -450,13 +459,10 @@ def ProcessRom(root_dir, rom_dir, rom_name):
         return
     elif rom_name=="sfiiina":
         split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
-        zip_game(rom_dir, rom_name)
     elif rom_name=="sfiii2n":
         split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2n_files, "cps3") # FB Neo
-        zip_game(rom_dir, rom_name)
     elif rom_name=="sfiii3nr1":
         split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3nr1_files, "cps3") # FB Neo
-        zip_game(rom_dir, rom_name)
     else:
         print("Unsupported rom="+rom_name)
         return	
@@ -472,28 +478,33 @@ def main(argc, argv):
     parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
     parser.add_argument("romFolderStr", help="Location for rom", type=str)
     parser.add_argument("--rom", "--r", help="rom name", type=str)
+    parser.add_argument("--type", "--t", help="conversion type", type=str)
 
     args = parser.parse_args()
 
     root_dir = args.extractFolderStr
     rom_dir = args.romFolderStr
     rom_name = args.rom
+    conversion_type = args.type
 	
     if not os.path.exists(root_dir):
         print("Cant find extraction dir, are you sure you're using this correctly? Read the README.")
-        exit(2)
+        exit(2)	
+
+    if conversion_type == None :
+        conversion_type = "sf30th"
 	
     if rom_name == None or rom_name == "all" :
         print("No --rom argument passed.  Extracting all available.")
-        ProcessRom(root_dir, rom_dir, "sf")
-        ProcessRom(root_dir, rom_dir, "sf2ub")
-        ProcessRom(root_dir, rom_dir, "sf2ceua")
-        ProcessRom(root_dir, rom_dir, "sf2t")
-        ProcessRom(root_dir, rom_dir, "sfiiina")
-        ProcessRom(root_dir, rom_dir, "sfiii2n")
-        ProcessRom(root_dir, rom_dir, "sfiii3nr1")
+        ProcessRom(root_dir, rom_dir, "sf", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sf2ub", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sf2ceua", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sf2t", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sfiiina", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sfiii2n", conversion_type)
+        ProcessRom(root_dir, rom_dir, "sfiii3nr1", conversion_type)
     else :	
-        ProcessRom(root_dir, rom_dir, rom_name)
+        ProcessRom(root_dir, rom_dir, rom_name, conversion_type)
 
     print("Finished")
 
