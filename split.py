@@ -473,24 +473,8 @@ def process_rom(root_dir, rom_dir, rom_name, conversion_type):
 def unsupported(rom_dir, rom_name):
     print("Unsupported rom = "+rom_name)
     rm_dir(rom_dir+'/'+rom_name)
-	
-def main(argc, argv):
-    if argc < 3:
-        usage()
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
-    parser.add_argument("romFolderStr", help="Location for rom", type=str)
-    parser.add_argument("--rom", "--r", help="rom name", type=str)
-    parser.add_argument("--type", "--t", help="conversion type", type=str)
-
-    args = parser.parse_args()
-
-    root_dir = args.extractFolderStr
-    rom_dir = args.romFolderStr
-    rom_name = args.rom
-    conversion_type = args.type
-	
+    
+def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
     if not os.path.exists(root_dir):
         print("Cant find extraction dir, are you sure you're using this correctly? Read the README.")
         exit(2)	
@@ -508,6 +492,25 @@ def main(argc, argv):
         process_rom(root_dir, rom_dir, individual_rom_name, conversion_type)
 
     print("Finished")
+
+def main(argc, argv):
+    if argc < 3:
+        usage()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
+    parser.add_argument("romFolderStr", help="Location for rom", type=str)
+    parser.add_argument("--rom", "--r", help="rom name", type=str)
+    parser.add_argument("--type", "--t", help="conversion type", type=str)
+
+    args = parser.parse_args()
+
+    root_dir = args.extractFolderStr
+    rom_dir = args.romFolderStr
+    rom_name = args.rom
+    conversion_type = args.type
+	
+    begin_convert(root_dir, rom_dir, rom_name, conversion_type)
 
     exit(0)
 
