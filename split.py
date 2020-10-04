@@ -1,7 +1,7 @@
 import os
 import sys
 import argparse
-from zipfile import ZipFile
+import zipfile
 
 def usage():
     print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"ConversionType\"")
@@ -205,12 +205,12 @@ sfiii3nr1_files = [
 def zip_game(rom_dir, rom_name):
     zipname=rom_dir+'/'+rom_name+'.zip'
     zipdir=rom_dir+'/'+rom_name
-    zipObj = ZipFile(zipname, 'w')
+    zipObj = zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED)
     for folderName, subfolders, filenames in os.walk(zipdir):
         for filename in filenames:
             # Add file to zip
-            zipfile=(zipdir+'/'+filename)
-            zipObj.write(zipfile)
+            zipfileLocation=(zipdir+'/'+filename)
+            zipObj.write(zipfileLocation, filename)
             print('Added '+filename+' to '+zipname)
 
 def rm_dir(dir):
