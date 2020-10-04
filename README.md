@@ -23,7 +23,7 @@ For some reason, the Second Impact music is in the Third Strike bundle, and the 
 python tidy.py "C:\...your extraction folder..."
 ```
 
-### Convert into MAME/FBN compatible ROMs.
+### Convert into MAME/FBN compatible ROMs
 To convert all the currently compatible ROMs execute the following.
 
 ```
@@ -31,7 +31,7 @@ python split.py "...your extraction folder..." "...your rom folder..."
 ```
 To convert a specific ROM execute the following.
 ```
-python split.py "...your extraction folder..." "...your rom folder..." -r "..selected rom..."
+python split.py "...your extraction folder..." "...your rom folder..." --r "..selected rom..."
 ```
 Where selected rom is one of the following: sf, sf2ub, sf2ceua, sf2t, sfiiina, sfiii2n or sfiii3nr1
 
