@@ -4,8 +4,9 @@ import argparse
 from zipfile import ZipFile
 
 def usage():
-    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" \"RomName\"")
+    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\"")
     print("RomName should be from: sf, sf2ub, sf2ceua, sf2t, ..., ..., ..., ..., ..., sfiiina, sfiii2n, sfiii3nr1")
+    print("If you do not include --rom, all currently extractable roms will be extracted")
     sys.exit(0)
 
 ##################################################################################################################
@@ -402,26 +403,8 @@ def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_file(dst_dir, dst_names, src_path, size)
 
-def main(argc, argv):
-    if argc != 4:
-        usage()
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
-    parser.add_argument("romFolderStr", help="Location for rom", type=str)
-    parser.add_argument("romStr", help="rom name", type=str)
-
-    args = parser.parse_args()
-
-    root_dir = args.extractFolderStr
-    rom_dir = args.romFolderStr
-    rom_name = args.romStr
-
-    if not os.path.exists(root_dir):
-        print("Cant find extraction dir, are you sure you're using this correctly? Read the README.")
-        exit(2)
-
-    #create rom_dir if missing
+def ProcessRom(root_dir, rom_dir, rom_name):
+	#create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
 
@@ -438,7 +421,6 @@ def main(argc, argv):
 
     if rom_name=="sf":
         split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
-        zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ub":
         split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
@@ -449,17 +431,23 @@ def main(argc, argv):
         split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2003 Plus
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2u":
+        print("Unsupported rom="+rom_name)
+        return
         #gfx2_offset=0x800000
         split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2tu":
         print("Unsupported rom="+rom_name)
+        return
     elif rom_name=="sfau":
         print("Unsupported rom="+rom_name)
+        return
     elif rom_name=="sfa2u":
         print("Unsupported rom="+rom_name)
+        return
     elif rom_name=="sfa3u":
         print("Unsupported rom="+rom_name)
+        return
     elif rom_name=="sfiiina":
         split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
         zip_game(rom_dir, rom_name)
@@ -471,6 +459,41 @@ def main(argc, argv):
         zip_game(rom_dir, rom_name)
     else:
         print("Unsupported rom="+rom_name)
+        return	
+		
+    zip_game(rom_dir, rom_name)
+    rm_dir(rom_dir+'/'+rom_name)
+
+def main(argc, argv):
+    if argc < 3:
+        usage()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
+    parser.add_argument("romFolderStr", help="Location for rom", type=str)
+    parser.add_argument("--rom", "--r", help="rom name", type=str)
+
+    args = parser.parse_args()
+
+    root_dir = args.extractFolderStr
+    rom_dir = args.romFolderStr
+    rom_name = args.rom
+	
+    if not os.path.exists(root_dir):
+        print("Cant find extraction dir, are you sure you're using this correctly? Read the README.")
+        exit(2)
+	
+    if rom_name == None or rom_name == "all" :
+        print("No --rom argument passed.  Extracting all available.")
+        ProcessRom(root_dir, rom_dir, "sf")
+        ProcessRom(root_dir, rom_dir, "sf2ub")
+        ProcessRom(root_dir, rom_dir, "sf2ceua")
+        ProcessRom(root_dir, rom_dir, "sf2t")
+        ProcessRom(root_dir, rom_dir, "sfiiina")
+        ProcessRom(root_dir, rom_dir, "sfiii2n")
+        ProcessRom(root_dir, rom_dir, "sfiii3nr1")
+    else :	
+        ProcessRom(root_dir, rom_dir, rom_name)
 
     print("Finished")
 
