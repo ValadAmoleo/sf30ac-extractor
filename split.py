@@ -422,13 +422,13 @@ def ProcessRom(root_dir, rom_dir, rom_name):
     if rom_name=="sf":
         split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
     elif rom_name=="sf2ub":
-        split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2003 Plus
+        split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2ceua":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1") # MAME-2003 Plus
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, sf2ceua_gfx, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
         zip_game(rom_dir, rom_name)
     elif rom_name=="sf2t":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2003 Plus
+        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
         zip_game(rom_dir, rom_name)
     elif rom_name=="ssf2u":
         print("Unsupported rom="+rom_name)
