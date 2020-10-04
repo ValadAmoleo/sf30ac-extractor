@@ -10,6 +10,10 @@ Download the project.
 ### Extract, Tidy & Convert
 If you're looking just to extract the ROMs from the Street Fighter 30th Anniversary Collection, you can now just extract the project files to the directory and run ConvertSF30th.py.  This doesn't delete the extracted folder so that you can still browse the other data contained.
 
+```
+python ConvertSF30th.py
+```
+
 ### Extraction
 Open a command line and execute the following command.
 
