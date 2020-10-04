@@ -6,8 +6,6 @@ import os
 import sys
 
 def extract(root_dir, root_bundles):
-    print(root_dir +" & " +root_bundles)
-    print(root_bundles + 'Manifest.plist')
     if not os.path.exists(root_bundles + 'Manifest.plist'):
         print("Cant find the bundles, are you sure you're using this correctly? Read the README.")
         exit(2)

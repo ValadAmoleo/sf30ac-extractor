@@ -7,7 +7,7 @@ def usage():
     print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"ConversionType\"")
     print("RomName should be from: sf, sf2ub, sf2ceua, sf2t, ..., ..., ..., ..., ..., sfiiina, sfiii2n, sfiii3nr1")
     print("If you do not include --rom, all currently extractable roms will be extracted.")
-    print("ConversionType can be a1up or sf30th.  If you do not include this, sf30th will be used.")
+    print("ConversionType can be sf30th, sfa1up or snk40th.  If you do not include this, sf30th will be used.")
     sys.exit(0)
 
 ##################################################################################################################
@@ -141,6 +141,36 @@ sf2t_files = [
 ]
 
 ##################################################################################################################
+#Beast Busters
+bbusters_code = [(
+    [
+        ("bb-3.k10", "bb-5.k12"),
+        ("bb-2.k8", "bb-4.k11")
+    ],
+    "bbusters.maincpu",
+    128 * 1024
+)]
+
+bbusters_gfx = [
+    (["bb-f11.m16", "bb-f12.m13", "bb-f13.m12", "bb-f14.m11"], "bbusters.gfx2", 524288),
+    (["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], "bbusters.gfx3", 524288)
+]
+
+bbusters_files = [
+    (["bb-1.e6"], "bbusters.audiocpu", 64 * 1024),
+    (["bb-10.l9"], "bbusters.gfx1", 128 * 1024),
+    (["bb-back1.m4"], "bbusters.gfx4", 512 * 1024),
+    (["bb-back2.m6"], "bbusters.gfx5", 512 * 1024),
+    (["bb-6.e7"], "bbusters.scale_table", 64 * 1024),
+    (["bb-7.h7"], "bbusters.scale_table", 64 * 1024),
+    (["bb-8.a14"], "bbusters.scale_table", 64 * 1024),
+    (["bb-9.c14"], "bbusters.scale_table", 64 * 1024),
+    (["bb-pcma.l5"], "bbusters.ymsnd", 512 * 1024),
+    (["bb-pcma.l3"], "bbusters.ymsnd.deltat", 512 * 1024),
+    (["bbusters-eeprom.bin"], "bbusters.eeprom", 256)    
+]
+
+##################################################################################################################
 #Super StreetFighter II (1993)
 #code (maincpu-ua.68k)
 #gfx (vrom)
@@ -232,7 +262,7 @@ def split_code_file(dst_dir, dst_names, src_path, size):
                         dst_even.write(src.read(1))
                         dst_odd.write(src.read(1))
 
-def split_code_file_alt(dst_dir, dst_names, src_path, size):
+def split_file_swab(dst_dir, dst_names, src_path, size):
     with open(src_path, "rb") as src:
         print(src_path)
         print(dst_names)
@@ -269,8 +299,7 @@ def decode_cps1_gfx(data):
         buf[i + 3] = (dwval >> 24) & 0xff
     return buf
 
-
-def split_gfx_file(dst_dir, dst_names, src_path, size, type):
+def split_gfx_file_4(dst_dir, dst_names, src_path, size, type):
     with open(src_path, "rb") as src:
         print(src_path)
         if type == "cps1":
@@ -297,6 +326,9 @@ def split_gfx_file(dst_dir, dst_names, src_path, size, type):
                                     dst_2.write(src.read(2))
                                     dst_3.write(src.read(2))
                                     dst_4.write(src.read(2))
+                                    
+def split_gfx_file(dst_dir, dst_names, src_path, size, type):
+    split_gfx_file_4(dst_dir, dst_names, src_path, size, type)
 
 def split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, offset):
     with open(src_path, "rb") as src:
@@ -371,15 +403,28 @@ def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_
             src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
             split_file(dst_dir, dst_names, src_path, size)
     else:
-        for (dst_names, src_ext, size) in code_files:
-            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-            split_code_file(dst_dir, dst_names, src_path, size)
-        for (dst_names, src_ext, size) in gfx_files:
-            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-            split_gfx_file(dst_dir, dst_names, src_path, size, type)
-        for (dst_names, src_ext, size) in split_files:
-            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-            split_file(dst_dir, dst_names, src_path, size)
+        if code_files != None :
+            for (dst_names, src_ext, size) in code_files:
+                if type == "snk" :
+                    src_path = os.path.join(root_dir, src_game_name, src_ext)
+                else :
+                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                split_code_file(dst_dir, dst_names, src_path, size)
+        if gfx_files != None :
+            for (dst_names, src_ext, size) in gfx_files:
+                if type == "snk" :
+                    src_path = os.path.join(root_dir, src_game_name, src_ext)
+                    split_file_swab(dst_dir, dst_names, src_path, size)
+                else :
+                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                    split_gfx_file(dst_dir, dst_names, src_path, size, type)
+        if split_files != None :
+            for (dst_names, src_ext, size) in split_files:
+                if type == "snk" :
+                    src_path = os.path.join(root_dir, src_game_name, src_ext)
+                else :
+                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                split_file(dst_dir, dst_names, src_path, size)
 
 #sf2hf
 def split_game_alt2(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
@@ -388,7 +433,7 @@ def split_game_alt2(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_
         os.mkdir(dst_dir)
     for (dst_names, src_ext, size) in code_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_code_file_alt(dst_dir, dst_names, src_path, size)
+        split_file_swab(dst_dir, dst_names, src_path, size)
     for (dst_names, src_ext, size) in gfx_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_gfx_file(dst_dir, dst_names, src_path, size, type)
@@ -402,7 +447,7 @@ def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1
         os.mkdir(dst_dir)
     for (dst_names, src_ext, size) in code_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_code_file_alt(dst_dir, dst_names, src_path, size)
+        split_file_swab(dst_dir, dst_names, src_path, size)
     for (dst_names, src_ext, size) in gfx1_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_gfx_file(dst_dir, dst_names, src_path, size, type)
@@ -428,44 +473,52 @@ def process_rom(root_dir, rom_dir, rom_name, conversion_type):
 
     #recreate an empty rom_name subfolder
     os.mkdir(rom_dir+'/'+rom_name)
-
-    if rom_name=="sf":
-        split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
-    elif rom_name=="sf2ub":
-        split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-    elif rom_name=="sf2ceua":
-        gfxFile = sf2ceua_gfx;
-        if conversion_type == "a1up" or conversion_type == "arcade1up" :
-            gfxFile = sf2ceua_gfx_a1up
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, gfxFile, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-    elif rom_name=="sf2t":
-        split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-    elif rom_name=="ssf2u":
-        unsupported(rom_dir, rom_name)
+    if conversion_type == "sf30th" or conversion_type == "sfa1up" :
+        if rom_name=="sf":
+            split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
+        elif rom_name=="sf2ub":
+            split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
+        elif rom_name=="sf2ceua":
+            gfxFile = sf2ceua_gfx;
+            if conversion_type == "sfa1up":
+                gfxFile = sf2ceua_gfx_a1up
+            split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, gfxFile, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
+        elif rom_name=="sf2t":
+            split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
+        elif rom_name=="ssf2u":
+            unsupported(rom_dir, rom_name)
+            return
+            #gfx2_offset=0x800000
+            split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
+        elif rom_name=="ssf2tu":
+            unsupported(rom_dir, rom_name)
+            return
+        elif rom_name=="sfau":
+            unsupported(rom_dir, rom_name)
+            return
+        elif rom_name=="sfa2u":
+            unsupported(rom_dir, rom_name)
+            return
+        elif rom_name=="sfa3u":
+            unsupported(rom_dir, rom_name)
+            return
+        elif rom_name=="sfiiina":
+            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
+        elif rom_name=="sfiii2n":
+            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2n_files, "cps3") # FB Neo
+        elif rom_name=="sfiii3nr1":
+            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3nr1_files, "cps3") # FB Neo
+        else:
+            unsupported(rom_dir, rom_name)
+            return
+    elif conversion_type == "snk40th" :
+        if rom_name=="bbusters" :
+            split_game_alt1(root_dir, rom_dir, rom_name, "DLC1", bbusters_code, bbusters_gfx, bbusters_files, "snk")
+        else:
+            unsupported(rom_dir, rom_name)
+            return
+    else :
         return
-        #gfx2_offset=0x800000
-        split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
-    elif rom_name=="ssf2tu":
-        unsupported(rom_dir, rom_name)
-        return
-    elif rom_name=="sfau":
-        unsupported(rom_dir, rom_name)
-        return
-    elif rom_name=="sfa2u":
-        unsupported(rom_dir, rom_name)
-        return
-    elif rom_name=="sfa3u":
-        unsupported(rom_dir, rom_name)
-        return
-    elif rom_name=="sfiiina":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
-    elif rom_name=="sfiii2n":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2n_files, "cps3") # FB Neo
-    elif rom_name=="sfiii3nr1":
-        split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3nr1_files, "cps3") # FB Neo
-    else:
-        unsupported(rom_dir, rom_name)
-        return	
 		
     zip_game(rom_dir, rom_name)
     rm_dir(rom_dir+'/'+rom_name)
@@ -481,10 +534,17 @@ def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
 
     if conversion_type == None :
         conversion_type = "sf30th"
+        
+    if conversion_type != "sf30th" and conversion_type != "sfa1up" and conversion_type != "snk40th":
+        print("Unsupported conversion type = " +conversion_type)
+        return
 	
     if rom_name == None or rom_name == "all" :
         print("No --rom argument passed.  Extracting all available.")
-        rom_name = "sf,sf2ub,sf2ceua,sf2t,sfiiina,sfiii2n,sfiii3nr1"
+        if conversion_type == "snk40th" :
+            rom_name = "bbusters"
+        else :
+            rom_name = "sf,sf2ub,sf2ceua,sf2t,sfiiina,sfiii2n,sfiii3nr1"
        
     rom_name.replace(" ", "")
     required_roms = rom_name.split(",")
