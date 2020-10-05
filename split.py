@@ -67,6 +67,12 @@ class SplitGameFile(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
         self.size = size
+       
+class SplitGameFileOffset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
 
 def get_games():
     all_games = []
@@ -172,6 +178,28 @@ def get_games():
     samsho_samsho.files.append(SplitGameFileSwab("SamuraiShodown_NGM.sprites.swizzled", ("045-c1.c1", "045-c2.c2", "045-c3.c3", "045-c4.c4"), 2097152))
     samsho_samsho.files.append(SplitGameFileSwabOffset("SamuraiShodown_NGM.sprites.swizzled", ("045-c51.c5", "045-c61.c6"), 1048576, 2097152 * 4))
     all_games.append(samsho_samsho)
+    
+    samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
+    samsho_samsho2.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
+    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
+    samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #Perfect
+    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1"))
+    samsho_samsho2.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
+    all_games.append(samsho_samsho2)
+    
+    samsho_samsho2k = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2k")
+    samsho_samsho2k.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
+    samsho_samsho2k.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
+    samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
+    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #Perfect
+    samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #perfect
+    
+    samsho_samsho2k.files.append(SplitGameFileSwab(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep1-kan.ep1"], 524288)) 
+    samsho_samsho2k.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
+    all_games.append(samsho_samsho2k)
     
     return all_games
 
@@ -371,6 +399,8 @@ def process_game_list(root_dir, game_list, rom_dir):
                 os.mkdir(dst_dir)
             if isinstance(file, SplitGameFile):
                 split_file(src_path, dst_dir, file)
+            if isinstance(file, SplitGameFileOffset):
+                split_file_offset(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileEvenOdd):
                 split_file_evenodd(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFile):
