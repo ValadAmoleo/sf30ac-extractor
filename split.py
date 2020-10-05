@@ -12,6 +12,7 @@ def usage():
 
 conversion_type_streetfighter30th = "sf30th"
 conversion_type_streetfighterarcade1up = "sfa1up"
+conversion_type_snk40th = "snk40th"
 
 debug = None
 
@@ -131,14 +132,40 @@ def get_games():
     sf30th_sfiii3nr1.files.append(RenameGameFile(sf30th_sfiii3nr1.extracted_folder_name +".bios", "sfiii3_usa.29f400.u2"))
     all_games.append(sf30th_sfiii3nr1)
     
+    snk40th_bbusters = Game("Beast Busters", conversion_type_snk40th, "DLC1", "bbusters")
+    snk40th_bbusters.compatibility.extend(["FB Neo"])
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".audiocpu", "bb-1.e6"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx1", "bb-10.l9"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx4", "bb-back1.m4"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx5", "bb-back2.m6"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".ymsnd", "bb-pcma.l5"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".ymsnd.deltat", "bb-pcma.l3"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".eeprom", "bbusters-eeprom.bin"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-6.e7"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-7.h7"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-8.a14"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-9.c14"))
+    snk40th_bbusters.files.append(SplitGameFileEvenOdd(snk40th_bbusters.rom_name +".maincpu", [("bb-3.k10", "bb-5.k12"),("bb-2.k8", "bb-4.k11")], 128 * 1024))
+    snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx2", ["bb-f11.m16", "bb-f12.m13", "bb-f13.m12", "bb-f14.m11"], 512 * 1024))
+    snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx3", ["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], 512 * 1024))
+    
+    all_games.append(snk40th_bbusters)
+    
     return all_games
 
 def create_game_list(rom_name, conversion_type, all_games):
     returnList = []
     for game in all_games :
-        if conversion_type == None or conversion_type == "all" or conversion_type == "" or game.contained_within == conversion_type:
-            if rom_name == None or rom_name == "all" or rom_name == "" or rom_name == game.rom_name :
-                returnList.append(game) 
+        if (rom_name == None or rom_name == "all" or rom_name == "" or rom_name == game.rom_name) and (conversion_type == None or conversion_type == "all" or conversion_type == "" or game.contained_within == conversion_type):
+            returnList.append(game)
+            
+    if len(returnList) == 0 :
+        if rom_name != "" and rom_name != None and conversion_type != "" and conversion_type != None:
+            print("Extracting " +rom_name +" from " +conversion_type +" is unsupported at this time.")
+        elif rom_name != "" and rom_name != None :
+            print(rom_name +" is unsupported at this time.")
+        elif conversion_type != "" and conversion_type != None :
+            print(conversion_type +" is unsupported at this time.")
         
     return returnList
     
@@ -286,9 +313,18 @@ def rm_dir(dir):
         for filename in filenames:
             os.remove(folderName+'/'+filename)
         os.rmdir(folderName)
+        
+def check_files_exist(root_dir, game):
+    for file in game.files:
+        src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
+        if os.path.exists(src_path) == False :
+            return False
 
 def process_game_list(root_dir, game_list, rom_dir):
     for game in game_list:
+        if check_files_exist(root_dir, game) == False:
+            print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found")
+            continue
         print("Converting: " +game.name)
         for file in game.files:
             src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
@@ -306,13 +342,11 @@ def process_game_list(root_dir, game_list, rom_dir):
             elif isinstance(file, SplitGameFileSwab) :
                 split_file_swab(src_path, dst_dir, file)
         zip_game(rom_dir, game)
-        rm_dir(rom_dir+'/'+game.rom_name)
         print(game.name +" is compatible with " + ", ".join(game.compatibility))
         game.converted = True
+        rm_dir(rom_dir+'/'+game.rom_name)
 
 def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
-    if conversion_type == None :
-        conversion_type = "sf30th"
     #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
@@ -320,6 +354,25 @@ def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
     all_games = get_games()
     game_list = create_game_list(rom_name, conversion_type, all_games)
     process_game_list(root_dir, game_list, rom_dir)
+    end_convert(game_list)
+
+def end_convert(game_list) :
+    unsuccessfulList = []
+    total = 0
+    for game in game_list :
+        if game.converted == False :
+            unsuccessfulList.append(game.name +" (" +game.contained_within +")")
+        total += 1
+    if total == 0 :
+        return
+    unsuccessful = len(unsuccessfulList)
+    successful = total-len(unsuccessfulList)
+    print("Finished converting.")
+    print(str(successful) +"/" +str(total) +" converted successfully.")
+    if unsuccessful > 0 :
+        print("Unsuccessful:")
+        print("\n".join(unsuccessfulList))
+        
 
 def main(argc, argv):
     if argc < 3:
