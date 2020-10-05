@@ -73,7 +73,8 @@ def create_game_list(rom_name, conversion_type, all_games):
     returnList = []
     for game in all_games :
         if game.contained_within == conversion_type_streetfighter30th:
-            returnList.append(game) 
+            if rom_name == "all" or rom_name == "" or rom_name == None or rom_name == game.rom_name :
+                returnList.append(game) 
         
     return returnList
     
