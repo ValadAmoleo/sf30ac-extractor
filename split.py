@@ -42,6 +42,12 @@ class RenameGameFileOffset(GameFile):
         super().__init__(filename, output_filename)
         self.offset = offset
         
+class SplitGameFileEvenOddOffset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+        
 class SplitGameFileEvenOdd(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
@@ -182,6 +188,17 @@ def get_games():
     snk40th_chopperb.files.append(RenameGameFile("chopper" +".tx_tiles", "kk_05.8p"))
     snk40th_chopperb.files.append(RenameGameFile("chopper" +".ym2", "kk_2.3j"))
     all_games.append(snk40th_chopperb)
+    
+    snk40th_ikari3 = Game("Ikari III: The Rescue", conversion_type_snk40th, "Main", "ikari3")
+    snk40th_ikari3.compatibility.extend(["FB Neo, MAME untested"])
+    snk40th_ikari3.files.append(SplitGameFile(snk40th_ikari3.rom_name +".gfx1", ["ik3-7.16l", "ik3-8.16m"], 32768))
+    snk40th_ikari3.files.append(SplitGameFileEvenOdd(snk40th_ikari3.rom_name +".gfx2", [("ik3-23.bin", "ik3-13.bin"), ("ik3-22.bin","ik3-12.bin"), ("ik3-21.bin","ik3-11.bin"), ("ik3-20.bin","ik3-10.bin"), ("ik3-19.bin","ik3-9.bin")], 131072))
+    snk40th_ikari3.files.append(SplitGameFileEvenOddOffset(snk40th_ikari3.rom_name +".gfx2", [("ik3-14.bin", "ik3-24.bin"), ("ik3-15.bin","ik3-25.bin"), ("ik3-16.bin","ik3-26.bin"), ("ik3-17.bin","ik3-27.bin"), ("ik3-18.bin","ik3-28.bin")], 131072, 131072*16))
+    snk40th_ikari3.files.append(SplitGameFileEvenOdd(snk40th_ikari3.rom_name +".maincpu", [("ik3-2-ver1.c10", "ik3-3-ver1.c9")], 128 * 1024))
+    snk40th_ikari3.files.append(RenameGameFile(snk40th_ikari3.rom_name +".soundcpu", "ik3-5.16d"))
+    snk40th_ikari3.files.append(RenameGameFile(snk40th_ikari3.rom_name +".upd", "ik3-6.18e"))
+    snk40th_ikari3.files.append(SplitGameFileEvenOdd(snk40th_ikari3.rom_name +".user1", [("ik3-1.c8", "ik3-4.c12")], 64 * 1024))
+    all_games.append(snk40th_ikari3)
     
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
@@ -415,6 +432,8 @@ def process_game_list(root_dir, game_list, rom_dir):
                 split_file_offset(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileEvenOdd):
                 split_file_evenodd(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileEvenOddOffset) :
+                split_file_evenodd_offset(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFile):
                 rename_file(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFileOffset):
