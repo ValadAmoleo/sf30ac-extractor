@@ -1,5 +1,5 @@
 # sf30ac-extractor
-Extract assets from Street Fighter 30th Anniversary Collection (music, roms, artwork, fonts...)
+Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection  (music, artwork, fonts, etc).  Also creates working ROMs from Street Fighter 30th Anniversary Collection and SNK 40th Anniversary Collection.
 
 ## Requirements
 You need to have a python 3 available somewhere
@@ -11,7 +11,7 @@ Download the project.
 If you're looking just to extract the ROMs from a supported collection, you can now just extract the project files to the collection directory and run Convert.py.  This doesn't delete the extracted folder so that you can still browse the other data contained.
 
 ```
-python ConvertSF30th.py
+python Convert.py
 ```
 
 ### Extraction
@@ -36,11 +36,10 @@ To convert all the currently compatible ROMs execute the following.
 ```
 python split.py "...your extraction folder..." "...your rom folder..."
 ```
-To convert a specific ROM execute the following.
+To convert a specific ROM or a specific collection execute the following and follow the instructions.
 ```
-python split.py "...your extraction folder..." "...your rom folder..." --r "..selected rom..."
+python split.py 
 ```
-Where selected rom is one of the following: sf, sf2ub, sf2ceua, sf2t, sfiiina, sfiii2n or sfiii3nr1
 
 ## Dependency
 `bplist.py` was stolen by the project [bplist-python](https://github.com/farcaller/bplist-python) with a few alterations to make this work.
