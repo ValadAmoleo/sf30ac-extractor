@@ -3,16 +3,18 @@ import sys
 import argparse
 import zipfile
 
-def usage():
-    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"ConversionType\"")
-    print("RomName should be from: sf, sf2ub, sf2ceua, sf2t, ..., ..., ..., ..., ..., sfiiina, sfiii2n, sfiii3nr1")
+def usage(game_list):
+    print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"Collection\"")
+    print("RomName should be from: " +game_list)
     print("If you do not include --rom, all currently extractable roms will be extracted.")
-    print("ConversionType can be sf30th, sfa1up or snk40th.  If you do not include this, sf30th will be used.")
+    print("Collection can be " +conversion_type_streetfighter30th +" , " +conversion_type_streetfighterarcade1up +", " +conversion_type_samuraishowdowncollection +" or "+conversion_type_snk40th +".")
+    print("If you do not include --type, all currently extractable roms for all collections will be attempted.  The majority will fail depending on where you have this script.")
     sys.exit(0)
 
 conversion_type_streetfighter30th = "sf30th"
 conversion_type_streetfighterarcade1up = "sfa1up"
 conversion_type_snk40th = "snk40th"
+conversion_type_samuraishowdowncollection = "samsho"
 
 debug = None
 
@@ -35,6 +37,11 @@ class RenameGameFile(GameFile):
     def __init__(self, filename, output_filename):
         super().__init__(filename, output_filename)
         
+class RenameGameFileOffset(GameFile):
+    def __init__(self, filename, output_filename, offset):
+        super().__init__(filename, output_filename)
+        self.offset = offset
+        
 class SplitGameFileEvenOdd(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
@@ -49,6 +56,12 @@ class SplitGameFileSwab(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
         self.size = size
+        
+class SplitGameFileSwabOffset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
        
 class SplitGameFile(GameFile):
     def __init__(self, filename, output_filenames, size):
@@ -133,7 +146,7 @@ def get_games():
     all_games.append(sf30th_sfiii3nr1)
     
     snk40th_bbusters = Game("Beast Busters", conversion_type_snk40th, "DLC1", "bbusters")
-    snk40th_bbusters.compatibility.extend(["FB Neo"])
+    snk40th_bbusters.compatibility.extend(["FB Neo, MAME untested"])
     snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".audiocpu", "bb-1.e6"))
     snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx1", "bb-10.l9"))
     snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx4", "bb-back1.m4"))
@@ -148,8 +161,17 @@ def get_games():
     snk40th_bbusters.files.append(SplitGameFileEvenOdd(snk40th_bbusters.rom_name +".maincpu", [("bb-3.k10", "bb-5.k12"),("bb-2.k8", "bb-4.k11")], 128 * 1024))
     snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx2", ["bb-f11.m16", "bb-f12.m13", "bb-f13.m12", "bb-f14.m11"], 512 * 1024))
     snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx3", ["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], 512 * 1024))
-    
     all_games.append(snk40th_bbusters)
+    
+    samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
+    samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
+    samsho_samsho.files.append(RenameGameFile(samsho_samsho.rom_name +".cslot1_fixed", "045-s1.s1"))
+    samsho_samsho.files.append(SplitGameFile(samsho_samsho.rom_name +".cslot1_ymsnd", ["045-v1.v1", "045-v2.v2"], 2097152))
+    samsho_samsho.files.append(SplitGameFileSwab(samsho_samsho.rom_name +".cslot1_maincpu", [("045-p1.p1"),("045-pg2.sp2")], 1048576))
+    samsho_samsho.files.append(SplitGameFileSwab("SamuraiShodown_NGM.sprites.swizzled", ("045-c1.c1", "045-c2.c2", "045-c3.c3", "045-c4.c4"), 2097152))
+    samsho_samsho.files.append(SplitGameFileSwabOffset("SamuraiShodown_NGM.sprites.swizzled", ("045-c51.c5", "045-c61.c6"), 1048576, 2097152 * 4))
+    all_games.append(samsho_samsho)
     
     return all_games
 
@@ -171,6 +193,14 @@ def create_game_list(rom_name, conversion_type, all_games):
     
 def rename_file(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
+        contents = src.read()
+        dst_path = os.path.join(dst_dir, file.output_filenames)
+        with open(dst_path, "wb") as dst:
+            dst.write(contents)
+            
+def rename_file_offset(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        src.read(file.offset)
         contents = src.read()
         dst_path = os.path.join(dst_dir, file.output_filenames)
         with open(dst_path, "wb") as dst:
@@ -318,12 +348,20 @@ def check_files_exist(root_dir, game):
     for file in game.files:
         src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
         if os.path.exists(src_path) == False :
+            print_if_debug("File not found: " +src_path)
             return False
+            
+def get_string_rom_name_list(games) :
+    gameNames = []
+    for game in games :
+        gameNames.append(game.rom_name)
+    return ", ".join(gameNames)
+        
 
 def process_game_list(root_dir, game_list, rom_dir):
     for game in game_list:
         if check_files_exist(root_dir, game) == False:
-            print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found")
+            print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found.")
             continue
         print("Converting: " +game.name)
         for file in game.files:
@@ -337,21 +375,24 @@ def process_game_list(root_dir, game_list, rom_dir):
                 split_file_evenodd(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFile):
                 rename_file(src_path, dst_dir, file)
+            elif isinstance(file, RenameGameFileOffset):
+                rename_file_offset(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileInterleave4Cps1) :
                 split_file_interleave_4_cps1(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileSwab) :
                 split_file_swab(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileSwabOffset) :
+                split_file_swab_offset(src_path, dst_dir, file)
         zip_game(rom_dir, game)
         print(game.name +" is compatible with " + ", ".join(game.compatibility))
         game.converted = True
         rm_dir(rom_dir+'/'+game.rom_name)
 
-def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
+def begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games):
     #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
         
-    all_games = get_games()
     game_list = create_game_list(rom_name, conversion_type, all_games)
     process_game_list(root_dir, game_list, rom_dir)
     end_convert(game_list)
@@ -375,8 +416,9 @@ def end_convert(game_list) :
         
 
 def main(argc, argv):
+    all_games = get_games()
     if argc < 3:
-        usage()
+        usage(get_string_rom_name_list(all_games))
 
     parser = argparse.ArgumentParser()
     parser.add_argument("extractFolderStr", help="Location for extraction", type=str)
@@ -393,7 +435,7 @@ def main(argc, argv):
     global debug
     debug = args.debug
     
-    begin_convert(root_dir, rom_dir, rom_name, conversion_type)
+    begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games)
 
     exit(0)
 
