@@ -169,6 +169,20 @@ def get_games():
     snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx3", ["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], 512 * 1024))
     all_games.append(snk40th_bbusters)
     
+    snk40th_chopperb = Game("Chopper I", conversion_type_snk40th, "Patch1", "chopperb")
+    snk40th_chopperb.compatibility.extend(["FB Neo, MAME untested"])
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".audiocpu", "kk_03.3d"))
+    snk40th_chopperb.files.append(SplitGameFile("chopper" +".bg_tiles", ["kk_10.8y", "kk_11.8z", "kk_12.8ab", "kk_13.8ac"], 65536))
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".maincpu", "kk_01.8g"))
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".plds", "pal16r6b.2c"))
+    snk40th_chopperb.files.append(SplitGameFile("chopper" +".proms", ["k1.9w", "k3.9u", "k2.9v"], 1024))
+    snk40th_chopperb.files.append(SplitGameFile("chopper" +".sp16_tiles", ["kk_09.3k", "kk_08.3l", "kk_07.3n", "kk_06.3p"], 32768))
+    snk40th_chopperb.files.append(SplitGameFile("chopper" +".sp32_tiles", ["kk_18.3ab", "kk_19.2ad", "kk_20.3y", "kk_21.3aa","kk_14.3v", "kk_15.3x", "kk_16.3s", "kk_17.3t"], 65536))
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".sub", "kk_04.6g"))
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".tx_tiles", "kk_05.8p"))
+    snk40th_chopperb.files.append(RenameGameFile("chopper" +".ym2", "kk_2.3j"))
+    all_games.append(snk40th_chopperb)
+    
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -180,7 +194,7 @@ def get_games():
     all_games.append(samsho_samsho)
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
-    samsho_samsho2.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho2.compatibility.extend(["Nothing - Garbled Graphics, Broken 063-p1.p1 file."])
     samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
     samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
     samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
@@ -190,14 +204,12 @@ def get_games():
     all_games.append(samsho_samsho2)
     
     samsho_samsho2k = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2k")
-    samsho_samsho2k.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho2k.compatibility.extend(["Nothing - Garbled Graphics, Missing Files."])
     samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
     samsho_samsho2k.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
     samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
     samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #Perfect
     samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #perfect
-    
-    samsho_samsho2k.files.append(SplitGameFileSwab(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep1-kan.ep1"], 524288)) 
     samsho_samsho2k.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
     all_games.append(samsho_samsho2k)
     
