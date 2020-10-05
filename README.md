@@ -11,7 +11,7 @@ Download the project.
 If you're looking just to extract the ROMs from a supported collection, you can now just extract the project files to the collection directory and run Convert.py.  This doesn't delete the extracted folder so that you can still browse the other data contained.
 
 ```
-python ConvertSF30th.py
+python Convert.py
 ```
 
 ### Extraction
