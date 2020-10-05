@@ -11,6 +11,7 @@ def usage():
     sys.exit(0)
 
 conversion_type_streetfighter30th = "sf30th"
+conversion_type_streetfighterarcade1up = "sfa1up"
 
 class Game(object):
     def __init__(self, name, contained_within, extracted_folder_name, rom_name):
@@ -20,6 +21,7 @@ class Game(object):
         self.rom_name = rom_name
         self.compatibility = []
         self.files = []
+        self.converted = False
         
 class GameFile(object):
     def __init__(self, filename, output_filenames):
@@ -36,6 +38,11 @@ class SplitGameFileEvenOdd(GameFile):
         self.size = size
        
 class SplitGameFileInterleave4Cps1(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
+       
+class SplitGameFileSwab(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
         self.size = size
@@ -60,20 +67,36 @@ def get_games():
     all_games.append(sf30th_sf)
     
     sf30th_sf2ub = Game("Street Fighter II The World Warrior", conversion_type_streetfighter30th, "StreetFighterII", "sf2ub")
-    sf30th_sf2ub.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006","MAME-2007"])
+    sf30th_sf2ub.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
     sf30th_sf2ub.files.append(RenameGameFile(sf30th_sf2ub.extracted_folder_name +".z80", "sf2_09.bin"))
     sf30th_sf2ub.files.append(SplitGameFile(sf30th_sf2ub.extracted_folder_name +".oki", ["sf2_18.bin", "sf2_19.bin"], 128 * 1024))
     sf30th_sf2ub.files.append(SplitGameFileEvenOdd(sf30th_sf2ub.extracted_folder_name +".ub.68k", [("sf2u.30e", "sf2u.37e"),("sf2u.31e", "sf2u.38e"),("sf2u.28e", "sf2u.35e"),("sf2.29a", "sf2.36a")], 128 * 1024))
     sf30th_sf2ub.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ub.extracted_folder_name +".vrom",[("sf2_06.bin", "sf2_08.bin", "sf2_05.bin", "sf2_07.bin"),("sf2_15.bin", "sf2_17.bin", "sf2_14.bin", "sf2_16.bin"),("sf2_25.bin", "sf2_27.bin", "sf2_24.bin", "sf2_26.bin")], 512 * 1024))
     all_games.append(sf30th_sf2ub)
     
+    sf30th_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighter30th, "StreetFighterII_CE", "sf2ceua")
+    sf30th_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sf30th_sf2ceua.files.append(RenameGameFile(sf30th_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
+    sf30th_sf2ceua.files.append(SplitGameFile(sf30th_sf2ceua.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sf30th_sf2ceua.files.append(SplitGameFileSwab(sf30th_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
+    sf30th_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ceua.extracted_folder_name +".vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
+    all_games.append(sf30th_sf2ceua)
+    
+    sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "StreetFighterII_CE", "sf2ceua")
+    sfa1up_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sfa1up_sf2ceua.files.append(RenameGameFile(sfa1up_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
+    sfa1up_sf2ceua.files.append(SplitGameFile(sfa1up_sf2ceua.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileSwab(sfa1up_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sfa1up_sf2ceua.extracted_folder_name +".patch.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
+    all_games.append(sfa1up_sf2ceua)
+    
     return all_games
 
 def create_game_list(rom_name, conversion_type, all_games):
     returnList = []
     for game in all_games :
-        if game.contained_within == conversion_type_streetfighter30th:
-            if rom_name == "all" or rom_name == "" or rom_name == None or rom_name == game.rom_name :
+        if conversion_type == None or conversion_type == "all" or conversion_type == "" or game.contained_within == conversion_type:
+            if rom_name == None or rom_name == "all" or rom_name == "" or rom_name == game.rom_name :
                 returnList.append(game) 
         
     return returnList
@@ -87,9 +110,9 @@ def rename_file(src_path, dst_dir, file):
 
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
+        print_if_debug(src_path)
         for (dst_even_name, dst_odd_name) in file.output_filenames:
-            print("\t" + dst_even_name + ", " + dst_odd_name)
+            print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
             dst_even_path = os.path.join(dst_dir, dst_even_name)
             dst_odd_path = os.path.join(dst_dir, dst_odd_name)
             with open(dst_even_path, "wb") as dst_even:
@@ -100,10 +123,10 @@ def split_file_evenodd(src_path, dst_dir, file):
                         
 def split_file_evenodd_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
+        print_if_debug(src_path)
         src.read(file.offset)
         for (dst_even_name, dst_odd_name) in file.output_filenames:
-            print("\t" + dst_even_name + ", " + dst_odd_name)
+            print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
             dst_even_path = os.path.join(dst_dir, dst_even_name)
             dst_odd_path = os.path.join(dst_dir, dst_odd_name)
             with open(dst_even_path, "wb") as dst_even:
@@ -114,9 +137,9 @@ def split_file_evenodd_offset(src_path, dst_dir, file):
                         
 def split_file(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
+        print_if_debug(src_path)
         for dst_name in file.output_filenames:
-            print("\t" + dst_name)
+            print_if_debug("\t" + dst_name)
             contents = src.read(file.size)
             dst_path = os.path.join(dst_dir, dst_name)
             with open(dst_path, "wb") as dst:
@@ -124,10 +147,10 @@ def split_file(src_path, dst_dir, file):
                 
 def split_file_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
+        print_if_debug(src_path)
         src.read(file.offset)
         for dst_name in file.output_filenames:
-            print("\t" + dst_name)
+            print_if_debug("\t" + dst_name)
             contents = src.read(file.size)
             dst_path = os.path.join(dst_dir, dst_name)
             with open(dst_path, "wb") as dst:
@@ -135,10 +158,10 @@ def split_file_offset(src_path, dst_dir, file):
                 
 def split_file_interleave_4_cps1(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
-        print("Decoding CPS1 Graphics")
+        print_if_debug(src_path)
+        print_if_debug("Decoding CPS1 Graphics")
         for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
-            print("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
             dst_path_1 = os.path.join(dst_dir, dst_name_1)
             dst_path_2 = os.path.join(dst_dir, dst_name_2)
             dst_path_3 = os.path.join(dst_dir, dst_name_3)
@@ -176,17 +199,46 @@ def decode_cps1_gfx(data):
         buf[i + 2] = (dwval >> 16) & 0xff
         buf[i + 3] = (dwval >> 24) & 0xff
     return buf
+    
+def split_file_swab(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        for (dst_name) in file.output_filenames:
+            print_if_debug("\t" + dst_name)
+            dst_path = os.path.join(dst_dir, dst_name)
+            with open(dst_path, "wb") as dst:
+                for i in range(file.size // 2):
+                    byte0=src.read(1)
+                    byte1=src.read(1)
+                    dst.write(byte1)
+                    dst.write(byte0)
+                    
+def split_file_swab_offset(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        src.read(file.offset)
+        for (dst_name) in file.output_filenames:
+            print_if_debug("\t" + dst_name)
+            dst_path = os.path.join(dst_dir, dst_name)
+            with open(dst_path, "wb") as dst:
+                for i in range(file.size // 2):
+                    byte0=src.read(1)
+                    byte1=src.read(1)
+                    dst.write(byte1)
+                    dst.write(byte0)
 
-def zip_game(rom_dir, rom_name):
-    zipname=rom_dir+'/'+rom_name+'.zip'
-    zipdir=rom_dir+'/'+rom_name
+def zip_game(rom_dir, game):
+    zipname=rom_dir+'/'+game.rom_name+'.zip'
+    zipdir=rom_dir+'/'+game.rom_name
     zipObj = zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED)
     for folderName, subfolders, filenames in os.walk(zipdir):
         for filename in filenames:
             # Add file to zip
             zipfileLocation=(zipdir+'/'+filename)
             zipObj.write(zipfileLocation, filename)
-    print(rom_name + " has been zipped to " +zipname)
+    print(game.name + " has been zipped to " +zipname)
+
+def print_if_debug(msg) :
+    if debug == True :
+        print(msg)
 
 def rm_dir(dir):
     for folderName, subfolders, filenames in os.walk(dir):
@@ -210,8 +262,12 @@ def process_game_list(root_dir, game_list, rom_dir):
                 rename_file(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileInterleave4Cps1) :
                 split_file_interleave_4_cps1(src_path, dst_dir, file)
-        zip_game(rom_dir, game.rom_name)
+            elif isinstance(file, SplitGameFileSwab) :
+                split_file_swab(src_path, dst_dir, file)
+        zip_game(rom_dir, game)
         rm_dir(rom_dir+'/'+game.rom_name)
+        print(game.name +" is compatible with " + ", ".join(game.compatibility))
+        game.converted = True
 
 def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
     if conversion_type == None :
@@ -234,13 +290,15 @@ def main(argc, argv):
     parser.add_argument("romFolderStr", help="Location for rom", type=str)
     parser.add_argument("--rom", "--r", help="rom name", type=str)
     parser.add_argument("--type", "--t", help="conversion type", type=str)
-
+    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default='false')
     args = parser.parse_args()
 
     root_dir = args.extractFolderStr
     rom_dir = args.romFolderStr
     rom_name = args.rom
     conversion_type = args.type
+    global debug
+    debug = args.debug
     
     begin_convert(root_dir, rom_dir, rom_name, conversion_type)
 
