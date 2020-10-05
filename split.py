@@ -13,6 +13,8 @@ def usage():
 conversion_type_streetfighter30th = "sf30th"
 conversion_type_streetfighterarcade1up = "sfa1up"
 
+debug = None
+
 class Game(object):
     def __init__(self, name, contained_within, extracted_folder_name, rom_name):
         self.name = name
@@ -311,7 +313,6 @@ def process_game_list(root_dir, game_list, rom_dir):
 def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
     if conversion_type == None :
         conversion_type = "sf30th"
-	
     #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
