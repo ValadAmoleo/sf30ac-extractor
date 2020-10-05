@@ -10,271 +10,240 @@ def usage():
     print("ConversionType can be sf30th, sfa1up or snk40th.  If you do not include this, sf30th will be used.")
     sys.exit(0)
 
-##################################################################################################################
-#Streetfighter
-#code (maincpu-u.68k)
-#gfx (gfx1-bplanes.rom 0-3, gfx2-mplanes.rom 0-3, gfx3-sprites.rom 0-3, gfx4-alpha.rom, tilerom-maps.rom)
-#files (audiocpu-z80, audio2-samples.rom)
-sf_code = [(
-    [
-        ("sfd-19.2a", "sfd-22.2c"),
-        ("sfd-20.3a", "sfd-23.3c"),
-        ("sfd-21.4a", "sfd-24.4c")
-    ],
-    "u.68k",
-    64 * 1024
-)]
+conversion_type_streetfighter30th = "sf30th"
+conversion_type_streetfighterarcade1up = "sfa1up"
+conversion_type_snk40th = "snk40th"
 
-sf_files = [
-    (["sf-39.2k", "sf-38.1k", "sf-41.4k", "sf-40.3k"], "bplanes.rom", 128 * 1024),
-    (["sf-25.1d", "sf-28.1e", "sf-30.1g", "sf-34.1h", "sf-26.2d", "sf-29.2e", "sf-31.2g", "sf-35.2h"], "mplanes.rom", 128 * 1024),
-    (["sf-15.1m", "sf-16.2m", "sf-11.1k", "sf-12.2k", "sf-07.1h", "sf-08.2h", "sf-03.1f", "sf-17.3m", "sf-18.4m", "sf-13.3k", "sf-14.4k", "sf-09.3h", "sf-10.4h","sf-05.3f"], "sprites.rom", 128 * 1024),
-    (["sf-27.4d"], "alpha.rom", 16 * 1024),
-    (["sf-37.4h", "sf-36.3h", "sf-32.3g", "sf-33.4g"], "maps.rom", 64 * 1024),
-    (["sf-02.7k"], "z80", 32 * 1024),
-    (["sfu-00.1h", "sf-01.1k"], "u.samples.rom", 128 * 1024)
-]
+debug = None
 
-##################################################################################################################
-#Streetfighter II
-#code (maincpu-ub.68k)
-#gfx (vrom)
-#files (audiocpu-z80, samples-oki)
-sf2ub_code = [(
-    [
-        ("sf2u.30e", "sf2u.37e"),
-        ("sf2u.31e", "sf2u.38e"),
-        ("sf2u.28e", "sf2u.35e"),
-        ("sf2.29a", "sf2.36a")
-    ],
-    "ub.68k",
-    128 * 1024
-)]
+class Game(object):
+    def __init__(self, name, contained_within, extracted_folder_name, rom_name):
+        self.name = name
+        self.contained_within = contained_within
+        self.extracted_folder_name = extracted_folder_name
+        self.rom_name = rom_name
+        self.compatibility = []
+        self.files = []
+        self.converted = False
+        
+class GameFile(object):
+    def __init__(self, filename, output_filenames):
+        self.filename = filename
+        self.output_filenames = output_filenames
 
-sf2ub_gfx = [(
-    [
-        ("sf2_06.bin", "sf2_08.bin", "sf2_05.bin", "sf2_07.bin"),
-        ("sf2_15.bin", "sf2_17.bin", "sf2_14.bin", "sf2_16.bin"),
-        ("sf2_25.bin", "sf2_27.bin", "sf2_24.bin", "sf2_26.bin")
-    ],
-    "vrom",
-    512 * 1024
-)]
-#bank size is 0x80000
+class RenameGameFile(GameFile):
+    def __init__(self, filename, output_filename):
+        super().__init__(filename, output_filename)
+        
+class SplitGameFileEvenOdd(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
+       
+class SplitGameFileInterleave4Cps1(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
+       
+class SplitGameFileSwab(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
+       
+class SplitGameFile(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
 
-sf2ub_files = [
-    (["sf2_09.bin"], "z80", 64 * 1024),
-    (["sf2_18.bin", "sf2_19.bin"], "oki", 128 * 1024),
-]
+def get_games():
+    all_games = []
+    sf30th_sf = Game("Street Fighter", conversion_type_streetfighter30th, "StreetFighter", "sf")
+    sf30th_sf.compatibility.append("FB Neo")
+    sf30th_sf.files.append(SplitGameFile(sf30th_sf.extracted_folder_name +".bplanes.rom", ["sf-39.2k", "sf-38.1k", "sf-41.4k", "sf-40.3k"], 128 * 1024))
+    sf30th_sf.files.append(SplitGameFile(sf30th_sf.extracted_folder_name +".mplanes.rom", ["sf-25.1d", "sf-28.1e", "sf-30.1g", "sf-34.1h", "sf-26.2d", "sf-29.2e", "sf-31.2g", "sf-35.2h"], 128 * 1024))
+    sf30th_sf.files.append(SplitGameFile(sf30th_sf.extracted_folder_name +".sprites.rom", ["sf-15.1m", "sf-16.2m", "sf-11.1k", "sf-12.2k", "sf-07.1h", "sf-08.2h", "sf-03.1f", "sf-17.3m", "sf-18.4m", "sf-13.3k", "sf-14.4k", "sf-09.3h", "sf-10.4h","sf-05.3f"], 128 * 1024))
+    sf30th_sf.files.append(RenameGameFile(sf30th_sf.extracted_folder_name +".alpha.rom", "sf-27.4d"))
+    sf30th_sf.files.append(SplitGameFile(sf30th_sf.extracted_folder_name +".maps.rom", ["sf-37.4h", "sf-36.3h", "sf-32.3g", "sf-33.4g"], 64 * 1024))
+    sf30th_sf.files.append(RenameGameFile(sf30th_sf.extracted_folder_name +".z80", "sf-02.7k"))
+    sf30th_sf.files.append(SplitGameFile(sf30th_sf.extracted_folder_name +".u.samples.rom", ["sfu-00.1h", "sf-01.1k"], 128 * 1024))
+    sf30th_sf.files.append(SplitGameFileEvenOdd(sf30th_sf.extracted_folder_name +".u.68k", [("sfd-19.2a", "sfd-22.2c"),("sfd-20.3a", "sfd-23.3c"),("sfd-21.4a", "sfd-24.4c")], 64 * 1024))
+    all_games.append(sf30th_sf)
+    
+    sf30th_sf2ub = Game("Street Fighter II The World Warrior", conversion_type_streetfighter30th, "StreetFighterII", "sf2ub")
+    sf30th_sf2ub.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sf30th_sf2ub.files.append(RenameGameFile(sf30th_sf2ub.extracted_folder_name +".z80", "sf2_09.bin"))
+    sf30th_sf2ub.files.append(SplitGameFile(sf30th_sf2ub.extracted_folder_name +".oki", ["sf2_18.bin", "sf2_19.bin"], 128 * 1024))
+    sf30th_sf2ub.files.append(SplitGameFileEvenOdd(sf30th_sf2ub.extracted_folder_name +".ub.68k", [("sf2u.30e", "sf2u.37e"),("sf2u.31e", "sf2u.38e"),("sf2u.28e", "sf2u.35e"),("sf2.29a", "sf2.36a")], 128 * 1024))
+    sf30th_sf2ub.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ub.extracted_folder_name +".vrom",[("sf2_06.bin", "sf2_08.bin", "sf2_05.bin", "sf2_07.bin"),("sf2_15.bin", "sf2_17.bin", "sf2_14.bin", "sf2_16.bin"),("sf2_25.bin", "sf2_27.bin", "sf2_24.bin", "sf2_26.bin")], 512 * 1024))
+    all_games.append(sf30th_sf2ub)
+    
+    sf30th_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighter30th, "StreetFighterII_CE", "sf2ceua")
+    sf30th_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sf30th_sf2ceua.files.append(RenameGameFile(sf30th_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
+    sf30th_sf2ceua.files.append(SplitGameFile(sf30th_sf2ceua.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sf30th_sf2ceua.files.append(SplitGameFileSwab(sf30th_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
+    sf30th_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ceua.extracted_folder_name +".vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
+    all_games.append(sf30th_sf2ceua)
+    
+    #Need to change the folder path on this one.  Can't remember the file structure for Arcade1Up though.
+    sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "StreetFighterII_CE", "sf2ceua")
+    sfa1up_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sfa1up_sf2ceua.files.append(RenameGameFile(sfa1up_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
+    sfa1up_sf2ceua.files.append(SplitGameFile(sfa1up_sf2ceua.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileSwab(sfa1up_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sfa1up_sf2ceua.extracted_folder_name +".patch.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
+    all_games.append(sfa1up_sf2ceua)
+    
+    sf30th_sf2t = Game("Street Fighter II': Hyper Fighting", conversion_type_streetfighter30th, "StreetFighterII_HF", "sf2t")
+    sf30th_sf2t.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sf30th_sf2t.files.append(RenameGameFile(sf30th_sf2t.extracted_folder_name +".z80", "s92_09.bin"))
+    sf30th_sf2t.files.append(SplitGameFile(sf30th_sf2t.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sf30th_sf2t.files.append(SplitGameFileSwab(sf30th_sf2t.extracted_folder_name +".u.68k", [("sf2_23a"),("sf2_22.bin"),("sf2_21.bin")], 512 * 1024))
+    sf30th_sf2t.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2t.extracted_folder_name +".u.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")], 512 * 1024))    
+    all_games.append(sf30th_sf2t)
+    
+    sf30th_sfiiina = Game("Street Fighter III: New Generation", conversion_type_streetfighter30th, "StreetFighterIII", "sfiiina")
+    sf30th_sfiiina.compatibility.extend(["FB Neo"])
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s1", ["sfiii-simm1.0", "sfiii-simm1.1", "sfiii-simm1.2", "sfiii-simm1.3"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s3", ["sfiii-simm3.0", "sfiii-simm3.1", "sfiii-simm3.2", "sfiii-simm3.3", "sfiii-simm3.4", "sfiii-simm3.5", "sfiii-simm3.6", "sfiii-simm3.7"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s4", ["sfiii-simm4.0", "sfiii-simm4.1", "sfiii-simm4.2", "sfiii-simm4.3", "sfiii-simm4.4", "sfiii-simm4.5", "sfiii-simm4.6", "sfiii-simm4.7"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s5", ["sfiii-simm5.0", "sfiii-simm5.1"], 2097152))
+    sf30th_sfiiina.files.append(RenameGameFile(sf30th_sfiiina.extracted_folder_name +".bios", "sfiii_euro.29f400.u2"))
+    all_games.append(sf30th_sfiiina)
+    
+    sf30th_sfiii2n = Game("Street Fighter III: 2nd Impact", conversion_type_streetfighter30th, "StreetFighterIII_2ndImpact", "sfiii2n")
+    sf30th_sfiii2n.compatibility.extend(["FB Neo"])
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s1", ["sfiii2-simm1.0", "sfiii2-simm1.1", "sfiii2-simm1.2", "sfiii2-simm1.3"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s2", ["sfiii2-simm2.0", "sfiii2-simm2.1", "sfiii2-simm2.2", "sfiii2-simm2.3"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s3", ["sfiii2-simm3.0", "sfiii2-simm3.1", "sfiii2-simm3.2", "sfiii2-simm3.3", "sfiii2-simm3.4", "sfiii2-simm3.5", "sfiii2-simm3.6", "sfiii2-simm3.7"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s4", ["sfiii2-simm4.0", "sfiii2-simm4.1", "sfiii2-simm4.2", "sfiii2-simm4.3", "sfiii2-simm4.4", "sfiii2-simm4.5", "sfiii2-simm4.6", "sfiii2-simm4.7"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s5", ["sfiii2-simm5.0", "sfiii2-simm5.1", "sfiii2-simm5.2", "sfiii2-simm5.3", "sfiii2-simm5.4", "sfiii2-simm5.5", "sfiii2-simm5.6", "sfiii2-simm5.7"], 2097152))
+    sf30th_sfiii2n.files.append(RenameGameFile(sf30th_sfiii2n.extracted_folder_name +".bios", "sfiii2_usa.29f400.u2"))
+    all_games.append(sf30th_sfiii2n)
+    
+    sf30th_sfiii3nr1 = Game("Street Fighter III: 3rd Strike", conversion_type_streetfighter30th, "StreetFighterIII_3rdStrike", "sfiii3nr1")
+    sf30th_sfiii3nr1.compatibility.extend(["FB Neo"])
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".r1.s1", ["sfiii3-simm1.0", "sfiii3-simm1.1", "sfiii3-simm1.2", "sfiii3-simm1.3"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".r1.s2", ["sfiii3-simm2.0", "sfiii3-simm2.1", "sfiii3-simm2.2", "sfiii3-simm2.3"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s3", ["sfiii3-simm3.0", "sfiii3-simm3.1", "sfiii3-simm3.2", "sfiii3-simm3.3", "sfiii3-simm3.4", "sfiii3-simm3.5", "sfiii3-simm3.6", "sfiii3-simm3.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s4", ["sfiii3-simm4.0", "sfiii3-simm4.1", "sfiii3-simm4.2", "sfiii3-simm4.3", "sfiii3-simm4.4", "sfiii3-simm4.5", "sfiii3-simm4.6", "sfiii3-simm4.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s5", ["sfiii3-simm5.0", "sfiii3-simm5.1", "sfiii3-simm5.2", "sfiii3-simm5.3", "sfiii3-simm5.4", "sfiii3-simm5.5", "sfiii3-simm5.6", "sfiii3-simm5.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s6", ["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(RenameGameFile(sf30th_sfiii3nr1.extracted_folder_name +".bios", "sfiii3_usa.29f400.u2"))
+    all_games.append(sf30th_sfiii3nr1)
+    
+    snk40th_bbusters = Game("Beast Busters", conversion_type_snk40th, "DLC1", "bbusters")
+    snk40th_bbusters.compatibility.extend(["FB Neo"])
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".audiocpu", "bb-1.e6"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx1", "bb-10.l9"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx4", "bb-back1.m4"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".gfx5", "bb-back2.m6"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".ymsnd", "bb-pcma.l5"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".ymsnd.deltat", "bb-pcma.l3"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".eeprom", "bbusters-eeprom.bin"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-6.e7"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-7.h7"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-8.a14"))
+    snk40th_bbusters.files.append(RenameGameFile(snk40th_bbusters.rom_name +".scale_table", "bb-9.c14"))
+    snk40th_bbusters.files.append(SplitGameFileEvenOdd(snk40th_bbusters.rom_name +".maincpu", [("bb-3.k10", "bb-5.k12"),("bb-2.k8", "bb-4.k11")], 128 * 1024))
+    snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx2", ["bb-f11.m16", "bb-f12.m13", "bb-f13.m12", "bb-f14.m11"], 512 * 1024))
+    snk40th_bbusters.files.append(SplitGameFileSwab(snk40th_bbusters.rom_name +".gfx3", ["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], 512 * 1024))
+    
+    all_games.append(snk40th_bbusters)
+    
+    return all_games
 
-##################################################################################################################
-#Streetfighter II': Champion Edition
-#code (maincpu-ua.68k)
-#gfx (vrom)
-#files (audiocpu-z80, samples-oki)
-sf2ceua_code = [(
-    [
-        ("s92u-23a"),
-        ("sf2ce.22"),
-        ("s92_21a.bin")
-    ],
-    "ua.68k",
-    512 * 1024
-)]
-#bank size is 0x80000
-
-sf2ceua_gfx = [(
-    [
-        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
-        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
-        ("s92_10.bin", "s92_11.bin", "s92_12.bin", "s92_13.bin")
-    ],
-    "vrom",
-    512 * 1024
-)]
-sf2ceua_gfx_a1up = [(
-    [
-        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
-        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
-        ("s92_10.bin", "s92_11.bin", "s92_12.bin", "s92_13.bin")
-    ],
-    "patch.vrom",
-    512 * 1024
-)]
-#bank size is 0x80000
-
-sf2ceua_files = [
-    (["s92_09.bin"], "z80", 64 * 1024),
-    (["s92_18.bin", "s92_19.bin"], "oki", 128 * 1024),
-]
-
-##################################################################################################################
-#StreetFighter II': Hyper Fighting (1992)
-#code (maincpu-ua.68k)
-#gfx (vrom)
-#files (audiocpu-z80, samples-oki)
-sf2t_code = [(
-    [
-        ("sf2_23"),
-        ("sf2_22.bin"),
-        ("sf2_21.bin")
-    ],
-    "u.68k",
-    512 * 1024
-)]
-#bank size is 0x80000
-
-sf2t_gfx = [(
-    [
-        ("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),
-        ("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),
-        ("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")
-    ],
-    "u.vrom",
-    512 * 1024
-)]
-#bank size is 0x80000
-
-sf2t_files = [
-    (["s92_09.bin"], "z80", 64 * 1024),
-    (["s92_18.bin", "s92_19.bin"], "oki", 128 * 1024),
-]
-
-##################################################################################################################
-#Beast Busters
-bbusters_code = [(
-    [
-        ("bb-3.k10", "bb-5.k12"),
-        ("bb-2.k8", "bb-4.k11")
-    ],
-    "bbusters.maincpu",
-    128 * 1024
-)]
-
-bbusters_gfx = [
-    (["bb-f11.m16", "bb-f12.m13", "bb-f13.m12", "bb-f14.m11"], "bbusters.gfx2", 524288),
-    (["bb-f21.l10", "bb-f22.l12", "bb-f23.l13", "bb-f24.l15"], "bbusters.gfx3", 524288)
-]
-
-bbusters_files = [
-    (["bb-1.e6"], "bbusters.audiocpu", 64 * 1024),
-    (["bb-10.l9"], "bbusters.gfx1", 128 * 1024),
-    (["bb-back1.m4"], "bbusters.gfx4", 512 * 1024),
-    (["bb-back2.m6"], "bbusters.gfx5", 512 * 1024),
-    (["bb-6.e7"], "bbusters.scale_table", 64 * 1024),
-    (["bb-7.h7"], "bbusters.scale_table", 64 * 1024),
-    (["bb-8.a14"], "bbusters.scale_table", 64 * 1024),
-    (["bb-9.c14"], "bbusters.scale_table", 64 * 1024),
-    (["bb-pcma.l5"], "bbusters.ymsnd", 512 * 1024),
-    (["bb-pcma.l3"], "bbusters.ymsnd.deltat", 512 * 1024),
-    (["bbusters-eeprom.bin"], "bbusters.eeprom", 256)    
-]
-
-##################################################################################################################
-#Super StreetFighter II (1993)
-#code (maincpu-ua.68k)
-#gfx (vrom)
-#files (audiocpu-z80, samples-oki)
-ssf2u_code = [(
-    [
-        ("ssfu.03a"),
-        ("ssfu.04a"),
-        ("ssfu.05"),
-        ("ssfu.06"),
-        ("ssfu.07")
-    ],
-    "u.68k",
-    512 * 1024
-)]
-#bank size is 0x80000
-
-ssf2u_gfx = [(
-    [
-        ("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m"),
-        ("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m")
-    ],
-    "vrom",
-    2048 * 1024
-)]
-
-#bank size is 0x80000
-
-ssf2u_files = [
-    (["ssf.01"], "z80", 64 * 1024),
-    (["ssf.q01", "ssf.q01", "ssf.q03", "ssf.q04", "ssf.q05", "ssf.q06", "ssf.q07", "ssf.q08"], "qs", 128 * 1024),
-]
-
-##################################################################################################################
-sfiiina_files = [
-    (["sfiii-simm1.0", "sfiii-simm1.1", "sfiii-simm1.2", "sfiii-simm1.3"], "s1", 2097152),
-    (["sfiii-simm3.0", "sfiii-simm3.1", "sfiii-simm3.2", "sfiii-simm3.3", "sfiii-simm3.4", "sfiii-simm3.5", "sfiii-simm3.6", "sfiii-simm3.7"], "s3", 2097152),
-    (["sfiii-simm4.0", "sfiii-simm4.1", "sfiii-simm4.2", "sfiii-simm4.3", "sfiii-simm4.4", "sfiii-simm4.5", "sfiii-simm4.6", "sfiii-simm4.7"], "s4", 2097152),
-    (["sfiii-simm5.0", "sfiii-simm5.1"], "s5", 2097152),
-    (["sfiii_euro.29f400.u2"], "bios", 512 * 1024)
-]
-
-sfiii2n_files = [
-    (["sfiii2-simm1.0", "sfiii2-simm1.1", "sfiii2-simm1.2", "sfiii2-simm1.3"], "s1", 2097152),
-    (["sfiii2-simm2.0", "sfiii2-simm2.1", "sfiii2-simm2.2", "sfiii2-simm2.3"], "s2", 2097152),
-    (["sfiii2-simm3.0", "sfiii2-simm3.1", "sfiii2-simm3.2", "sfiii2-simm3.3", "sfiii2-simm3.4", "sfiii2-simm3.5", "sfiii2-simm3.6", "sfiii2-simm3.7"], "s3", 2097152),
-    (["sfiii2-simm4.0", "sfiii2-simm4.1", "sfiii2-simm4.2", "sfiii2-simm4.3", "sfiii2-simm4.4", "sfiii2-simm4.5", "sfiii2-simm4.6", "sfiii2-simm4.7"], "s4", 2097152),
-    (["sfiii2-simm5.0", "sfiii2-simm5.1", "sfiii2-simm5.2", "sfiii2-simm5.3", "sfiii2-simm5.4", "sfiii2-simm5.5", "sfiii2-simm5.6", "sfiii2-simm5.7"], "s5", 2097152),
-    (["sfiii2_usa.29f400.u2"], "bios", 512 * 1024)
-]
-
-sfiii3nr1_files = [
-    (["sfiii3-simm1.0", "sfiii3-simm1.1", "sfiii3-simm1.2", "sfiii3-simm1.3"], "r1.s1", 2097152),
-    (["sfiii3-simm2.0", "sfiii3-simm2.1", "sfiii3-simm2.2", "sfiii3-simm2.3"], "r1.s2", 2097152),
-    (["sfiii3-simm3.0", "sfiii3-simm3.1", "sfiii3-simm3.2", "sfiii3-simm3.3", "sfiii3-simm3.4", "sfiii3-simm3.5", "sfiii3-simm3.6", "sfiii3-simm3.7"], "s3", 2097152),
-    (["sfiii3-simm4.0", "sfiii3-simm4.1", "sfiii3-simm4.2", "sfiii3-simm4.3", "sfiii3-simm4.4", "sfiii3-simm4.5", "sfiii3-simm4.6", "sfiii3-simm4.7"], "s4", 2097152),
-    (["sfiii3-simm5.0", "sfiii3-simm5.1", "sfiii3-simm5.2", "sfiii3-simm5.3", "sfiii3-simm5.4", "sfiii3-simm5.5", "sfiii3-simm5.6", "sfiii3-simm5.7"], "s5", 2097152),
-    (["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], "s6", 2097152),
-    (["sfiii3_usa.29f400.u2"], "bios", 512 * 1024)
-]
-
-def zip_game(rom_dir, rom_name):
-    zipname=rom_dir+'/'+rom_name+'.zip'
-    zipdir=rom_dir+'/'+rom_name
-    zipObj = zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED)
-    for folderName, subfolders, filenames in os.walk(zipdir):
-        for filename in filenames:
-            # Add file to zip
-            zipfileLocation=(zipdir+'/'+filename)
-            zipObj.write(zipfileLocation, filename)
-    print(rom_name + " has been zipped to " +zipname)
-
-def rm_dir(dir):
-    for folderName, subfolders, filenames in os.walk(dir):
-        for filename in filenames:
-            os.remove(folderName+'/'+filename)
-        os.rmdir(folderName)
-
-def split_code_file(dst_dir, dst_names, src_path, size):
+def create_game_list(rom_name, conversion_type, all_games):
+    returnList = []
+    for game in all_games :
+        if (rom_name == None or rom_name == "all" or rom_name == "" or rom_name == game.rom_name) and (conversion_type == None or conversion_type == "all" or conversion_type == "" or game.contained_within == conversion_type):
+            returnList.append(game)
+            
+    if len(returnList) == 0 :
+        if rom_name != "" and rom_name != None and conversion_type != "" and conversion_type != None:
+            print("Extracting " +rom_name +" from " +conversion_type +" is unsupported at this time.")
+        elif rom_name != "" and rom_name != None :
+            print(rom_name +" is unsupported at this time.")
+        elif conversion_type != "" and conversion_type != None :
+            print(conversion_type +" is unsupported at this time.")
+        
+    return returnList
+    
+def rename_file(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
-        for (dst_even_name, dst_odd_name) in dst_names:
-            print("\t" + dst_even_name + ", " + dst_odd_name)
+        contents = src.read()
+        dst_path = os.path.join(dst_dir, file.output_filenames)
+        with open(dst_path, "wb") as dst:
+            dst.write(contents)
+
+def split_file_evenodd(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        for (dst_even_name, dst_odd_name) in file.output_filenames:
+            print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
             dst_even_path = os.path.join(dst_dir, dst_even_name)
             dst_odd_path = os.path.join(dst_dir, dst_odd_name)
             with open(dst_even_path, "wb") as dst_even:
                 with open(dst_odd_path, "wb") as dst_odd:
-                    for i in range(size):
+                    for i in range(file.size):
                         dst_even.write(src.read(1))
                         dst_odd.write(src.read(1))
-
-def split_file_swab(dst_dir, dst_names, src_path, size):
+                        
+def split_file_evenodd_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
-        print(dst_names)
-        for (dst_name) in dst_names:
-            print("\t" + dst_name)
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for (dst_even_name, dst_odd_name) in file.output_filenames:
+            print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
+            dst_even_path = os.path.join(dst_dir, dst_even_name)
+            dst_odd_path = os.path.join(dst_dir, dst_odd_name)
+            with open(dst_even_path, "wb") as dst_even:
+                with open(dst_odd_path, "wb") as dst_odd:
+                    for i in range(file.size):
+                        dst_even.write(src.read(1))
+                        dst_odd.write(src.read(1))
+                        
+def split_file(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        for dst_name in file.output_filenames:
+            print_if_debug("\t" + dst_name)
+            contents = src.read(file.size)
             dst_path = os.path.join(dst_dir, dst_name)
             with open(dst_path, "wb") as dst:
-                for i in range(size // 2):
-                    byte0=src.read(1)
-                    byte1=src.read(1)
-                    dst.write(byte1)
-                    dst.write(byte0)
+                dst.write(contents)
+                
+def split_file_offset(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for dst_name in file.output_filenames:
+            print_if_debug("\t" + dst_name)
+            contents = src.read(file.size)
+            dst_path = os.path.join(dst_dir, dst_name)
+            with open(dst_path, "wb") as dst:
+                dst.write(contents)
+                
+def split_file_interleave_4_cps1(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        print_if_debug("Decoding CPS1 Graphics")
+        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            dst_path_3 = os.path.join(dst_dir, dst_name_3)
+            dst_path_4 = os.path.join(dst_dir, dst_name_4)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    with open(dst_path_3, "wb") as dst_3:
+                        with open(dst_path_4, "wb") as dst_4:
+                            for i in range(file.size // 2):
+                                data = decode_cps1_gfx(src.read(8))
+                                dst_1.write(data[0:2])
+                                dst_2.write(data[2:4])
+                                dst_3.write(data[4:6])
+                                dst_4.write(data[6:8])
 
 def decode_cps1_gfx(data):
     buf = bytearray(data)
@@ -298,260 +267,112 @@ def decode_cps1_gfx(data):
         buf[i + 2] = (dwval >> 16) & 0xff
         buf[i + 3] = (dwval >> 24) & 0xff
     return buf
-
-def split_gfx_file_4(dst_dir, dst_names, src_path, size, type):
+    
+def split_file_swab(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
-        if type == "cps1":
-            print("Decoding CPS1 Graphics")
-        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in dst_names:
-            print("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
-            dst_path_1 = os.path.join(dst_dir, dst_name_1)
-            dst_path_2 = os.path.join(dst_dir, dst_name_2)
-            dst_path_3 = os.path.join(dst_dir, dst_name_3)
-            dst_path_4 = os.path.join(dst_dir, dst_name_4)
-            with open(dst_path_1, "wb") as dst_1:
-                with open(dst_path_2, "wb") as dst_2:
-                    with open(dst_path_3, "wb") as dst_3:
-                        with open(dst_path_4, "wb") as dst_4:
-                            for i in range(size // 2):
-                                if type == "cps1":
-                                    data = decode_cps1_gfx(src.read(8))
-                                    dst_1.write(data[0:2])
-                                    dst_2.write(data[2:4])
-                                    dst_3.write(data[4:6])
-                                    dst_4.write(data[6:8])
-                                else:
-                                    dst_1.write(src.read(2))
-                                    dst_2.write(src.read(2))
-                                    dst_3.write(src.read(2))
-                                    dst_4.write(src.read(2))
-                                    
-def split_gfx_file(dst_dir, dst_names, src_path, size, type):
-    split_gfx_file_4(dst_dir, dst_names, src_path, size, type)
-
-def split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, offset):
-    with open(src_path, "rb") as src:
-        print(src_path)
-        src.read(offset)
-        if type == "cps1":
-            print("Decoding CPS1 Graphics")
-        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in dst_names:
-            print("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
-            dst_path_1 = os.path.join(dst_dir, dst_name_1)
-            dst_path_2 = os.path.join(dst_dir, dst_name_2)
-            dst_path_3 = os.path.join(dst_dir, dst_name_3)
-            dst_path_4 = os.path.join(dst_dir, dst_name_4)
-            with open(dst_path_1, "wb") as dst_1:
-                with open(dst_path_2, "wb") as dst_2:
-                    with open(dst_path_3, "wb") as dst_3:
-                        with open(dst_path_4, "wb") as dst_4:
-                            for i in range(size // 2):
-                                if type == "cps1":
-                                    data = decode_cps1_gfx(src.read(8))
-                                    dst_1.write(data[0:2])
-                                    dst_2.write(data[2:4])
-                                    dst_3.write(data[4:6])
-                                    dst_4.write(data[6:8])
-                                else:
-                                    dst_1.write(src.read(2))
-                                    dst_2.write(src.read(2))
-                                    dst_3.write(src.read(2))
-                                    dst_4.write(src.read(2))
-
-def split_file(dst_dir, dst_names, src_path, size):
-    with open(src_path, "rb") as src:
-        print(src_path)
-        for dst_name in dst_names:
-            print("\t" + dst_name)
-            contents = src.read(size)
+        for (dst_name) in file.output_filenames:
+            print_if_debug("\t" + dst_name)
             dst_path = os.path.join(dst_dir, dst_name)
             with open(dst_path, "wb") as dst:
-                dst.write(contents)
-
-def split_file_offset(dst_dir, dst_names, src_path, size, offset):
+                for i in range(file.size // 2):
+                    byte0=src.read(1)
+                    byte1=src.read(1)
+                    dst.write(byte1)
+                    dst.write(byte0)
+                    
+def split_file_swab_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        print(src_path)
-        src.read(offset)
-        for dst_name in dst_names:
-            print("\t" + dst_name)
-            contents = src.read(size)
+        src.read(file.offset)
+        for (dst_name) in file.output_filenames:
+            print_if_debug("\t" + dst_name)
             dst_path = os.path.join(dst_dir, dst_name)
             with open(dst_path, "wb") as dst:
-                dst.write(contents)
+                for i in range(file.size // 2):
+                    byte0=src.read(1)
+                    byte1=src.read(1)
+                    dst.write(byte1)
+                    dst.write(byte0)
 
-#sf
-def split_game(root_dir, rom_dir, rom_name, src_game_name, code_files, split_files, type):
-    dst_dir = os.path.join(rom_dir, rom_name)
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-    for (dst_names, src_ext, size) in code_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_code_file(dst_dir, dst_names, src_path, size)
-    for (dst_names, src_ext, size) in split_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+def zip_game(rom_dir, game):
+    zipname=rom_dir+'/'+game.rom_name+'.zip'
+    zipdir=rom_dir+'/'+game.rom_name
+    zipObj = zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED)
+    for folderName, subfolders, filenames in os.walk(zipdir):
+        for filename in filenames:
+            # Add file to zip
+            zipfileLocation=(zipdir+'/'+filename)
+            zipObj.write(zipfileLocation, filename)
+    print(game.name + " has been zipped to " +zipname)
 
-#sf2ub,sfiiina,sfiii2n,sfiii3nr1
-def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
-    dst_dir = os.path.join(rom_dir, rom_name)
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-    if type == "cps3":
-        print("Splitting CPS3 Files")
-        for (dst_names, src_ext, size) in split_files:
-            src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-            split_file(dst_dir, dst_names, src_path, size)
-    else:
-        if code_files != None :
-            for (dst_names, src_ext, size) in code_files:
-                if type == "snk" :
-                    src_path = os.path.join(root_dir, src_game_name, src_ext)
-                else :
-                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                split_code_file(dst_dir, dst_names, src_path, size)
-        if gfx_files != None :
-            for (dst_names, src_ext, size) in gfx_files:
-                if type == "snk" :
-                    src_path = os.path.join(root_dir, src_game_name, src_ext)
-                    split_file_swab(dst_dir, dst_names, src_path, size)
-                else :
-                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                    split_gfx_file(dst_dir, dst_names, src_path, size, type)
-        if split_files != None :
-            for (dst_names, src_ext, size) in split_files:
-                if type == "snk" :
-                    src_path = os.path.join(root_dir, src_game_name, src_ext)
-                else :
-                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                split_file(dst_dir, dst_names, src_path, size)
+def print_if_debug(msg) :
+    if debug == True :
+        print(msg)
 
-#sf2hf
-def split_game_alt2(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
-    dst_dir = os.path.join(rom_dir, rom_name)
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-    for (dst_names, src_ext, size) in code_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file_swab(dst_dir, dst_names, src_path, size)
-    for (dst_names, src_ext, size) in gfx_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size, type)
-    for (dst_names, src_ext, size) in split_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+def rm_dir(dir):
+    for folderName, subfolders, filenames in os.walk(dir):
+        for filename in filenames:
+            os.remove(folderName+'/'+filename)
+        os.rmdir(folderName)
+        
+def check_files_exist(root_dir, game):
+    for file in game.files:
+        src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
+        if os.path.exists(src_path) == False :
+            return False
 
-def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1_files, gfx2_files, gfx2_offset, split_files, type):
-    dst_dir = os.path.join(rom_dir, rom_name)
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-    for (dst_names, src_ext, size) in code_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file_swab(dst_dir, dst_names, src_path, size)
-    for (dst_names, src_ext, size) in gfx1_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size, type)
-    for (dst_names, src_ext, size) in gfx2_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, gfx2_offset)
-    for (dst_names, src_ext, size) in split_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+def process_game_list(root_dir, game_list, rom_dir):
+    for game in game_list:
+        if check_files_exist(root_dir, game) == False:
+            print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found")
+            continue
+        print("Converting: " +game.name)
+        for file in game.files:
+            src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
+            dst_dir = os.path.join(rom_dir, game.rom_name)
+            if not os.path.exists(dst_dir):
+                os.mkdir(dst_dir)
+            if isinstance(file, SplitGameFile):
+                split_file(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileEvenOdd):
+                split_file_evenodd(src_path, dst_dir, file)
+            elif isinstance(file, RenameGameFile):
+                rename_file(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleave4Cps1) :
+                split_file_interleave_4_cps1(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileSwab) :
+                split_file_swab(src_path, dst_dir, file)
+        zip_game(rom_dir, game)
+        print(game.name +" is compatible with " + ", ".join(game.compatibility))
+        game.converted = True
+        rm_dir(rom_dir+'/'+game.rom_name)
 
-def process_rom(root_dir, rom_dir, rom_name, conversion_type):
-	#create rom_dir if missing
+def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
+    #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
-
-    #remove rom_name subfolder if it exists
-    if os.path.exists(rom_dir+'/'+rom_name):
-        rm_dir(rom_dir+'/'+rom_name)
-
-    #remove the rom_name.zip file if it exists
-    if os.path.exists(rom_dir+'/'+rom_name+'.zip'):
-        os.remove(rom_dir+'/'+rom_name+'.zip')
-
-    #recreate an empty rom_name subfolder
-    os.mkdir(rom_dir+'/'+rom_name)
-    if conversion_type == "sf30th" or conversion_type == "sfa1up" :
-        if rom_name=="sf":
-            split_game(root_dir, rom_dir, rom_name, "StreetFighter", sf_code, sf_files, "cps1") # FB Neo
-        elif rom_name=="sf2ub":
-            split_game_alt1(root_dir, rom_dir, rom_name, "StreetFighterII", sf2ub_code, sf2ub_gfx, sf2ub_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        elif rom_name=="sf2ceua":
-            gfxFile = sf2ceua_gfx;
-            if conversion_type == "sfa1up":
-                gfxFile = sf2ceua_gfx_a1up
-            split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_CE", sf2ceua_code, gfxFile, sf2ceua_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        elif rom_name=="sf2t":
-            split_game_alt2(root_dir, rom_dir, rom_name,  "StreetFighterII_HF", sf2t_code, sf2t_gfx, sf2t_files, "cps1") # MAME-2001, MAME-2003, MAME-2003 Plus, MAME-2004, MAME-2005, MAME-2006, MAME-2007
-        elif rom_name=="ssf2u":
-            unsupported(rom_dir, rom_name)
-            return
-            #gfx2_offset=0x800000
-            split_game_alt1(root_dir, rom_dir, rom_name,  "SuperStreetFighterII", ssf2u_code, ssf2u_gfx, ssf2u_files, "cps2")
-        elif rom_name=="ssf2tu":
-            unsupported(rom_dir, rom_name)
-            return
-        elif rom_name=="sfau":
-            unsupported(rom_dir, rom_name)
-            return
-        elif rom_name=="sfa2u":
-            unsupported(rom_dir, rom_name)
-            return
-        elif rom_name=="sfa3u":
-            unsupported(rom_dir, rom_name)
-            return
-        elif rom_name=="sfiiina":
-            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII", None, None, sfiiina_files, "cps3") # FB Neo
-        elif rom_name=="sfiii2n":
-            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_2ndImpact", None, None, sfiii2n_files, "cps3") # FB Neo
-        elif rom_name=="sfiii3nr1":
-            split_game_alt1(root_dir, rom_dir, rom_name,  "StreetFighterIII_3rdStrike", None, None, sfiii3nr1_files, "cps3") # FB Neo
-        else:
-            unsupported(rom_dir, rom_name)
-            return
-    elif conversion_type == "snk40th" :
-        if rom_name=="bbusters" :
-            split_game_alt1(root_dir, rom_dir, rom_name, "DLC1", bbusters_code, bbusters_gfx, bbusters_files, "snk")
-        else:
-            unsupported(rom_dir, rom_name)
-            return
-    else :
-        return
-		
-    zip_game(rom_dir, rom_name)
-    rm_dir(rom_dir+'/'+rom_name)
-
-def unsupported(rom_dir, rom_name):
-    print("Unsupported rom = "+rom_name)
-    rm_dir(rom_dir+'/'+rom_name)
-    
-def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
-    if not os.path.exists(root_dir):
-        print("Cant find extraction dir, are you sure you're using this correctly? Read the README.")
-        exit(2)	
-
-    if conversion_type == None :
-        conversion_type = "sf30th"
         
-    if conversion_type != "sf30th" and conversion_type != "sfa1up" and conversion_type != "snk40th":
-        print("Unsupported conversion type = " +conversion_type)
-        return
-	
-    if rom_name == None or rom_name == "all" :
-        print("No --rom argument passed.  Extracting all available.")
-        if conversion_type == "snk40th" :
-            rom_name = "bbusters"
-        else :
-            rom_name = "sf,sf2ub,sf2ceua,sf2t,sfiiina,sfiii2n,sfiii3nr1"
-       
-    rom_name.replace(" ", "")
-    required_roms = rom_name.split(",")
-    for individual_rom_name in required_roms:
-        process_rom(root_dir, rom_dir, individual_rom_name, conversion_type)
+    all_games = get_games()
+    game_list = create_game_list(rom_name, conversion_type, all_games)
+    process_game_list(root_dir, game_list, rom_dir)
+    end_convert(game_list)
 
-    print("Finished")
+def end_convert(game_list) :
+    unsuccessfulList = []
+    total = 0
+    for game in game_list :
+        if game.converted == False :
+            unsuccessfulList.append(game.name +" (" +game.contained_within +")")
+        total += 1
+    if total == 0 :
+        return
+    unsuccessful = len(unsuccessfulList)
+    successful = total-len(unsuccessfulList)
+    print("Finished converting.")
+    print(str(successful) +"/" +str(total) +" converted successfully.")
+    if unsuccessful > 0 :
+        print("Unsuccessful:")
+        print("\n".join(unsuccessfulList))
+        
 
 def main(argc, argv):
     if argc < 3:
@@ -562,17 +383,20 @@ def main(argc, argv):
     parser.add_argument("romFolderStr", help="Location for rom", type=str)
     parser.add_argument("--rom", "--r", help="rom name", type=str)
     parser.add_argument("--type", "--t", help="conversion type", type=str)
-
+    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default='false')
     args = parser.parse_args()
 
     root_dir = args.extractFolderStr
     rom_dir = args.romFolderStr
     rom_name = args.rom
     conversion_type = args.type
-	
+    global debug
+    debug = args.debug
+    
     begin_convert(root_dir, rom_dir, rom_name, conversion_type)
 
     exit(0)
 
 if __name__ == "__main__":
     main(len(sys.argv), sys.argv)
+        
