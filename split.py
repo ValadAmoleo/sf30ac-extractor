@@ -171,6 +171,27 @@ bbusters_files = [
 ]
 
 ##################################################################################################################
+#Samurai Shodown
+samsho_code = [(
+    [
+        ("045-p1.p1"),
+        ("045-pg2.sp2")
+    ],
+     "samsho.cslot1_maincpu",
+     1048576
+ )]
+samsho_gfx = [
+    (("045-c1.c1", "045-c2.c2", "045-c3.c3", "045-c4.c4"), "SamuraiShodown_NGM.sprites.swizzled", 2097152, 0),
+    (("045-c51.c5", "045-c61.c6"), "SamuraiShodown_NGM.sprites.swizzled", 1048576, 2097152 * 4)
+]
+
+samsho_files = [
+    (["045-m1.m1"], "samsho.cslot1_audiocpu", 128 * 1024, (192 * 1024) - (128 * 1024)),
+    (["045-s1.s1"], "samsho.cslot1_fixed", 131072, 0) ,
+    (["045-v1.v1", "045-v2.v2"], "samsho.cslot1_ymsnd", 2097152, 0)
+]
+
+##################################################################################################################
 #Super StreetFighter II (1993)
 #code (maincpu-ua.68k)
 #gfx (vrom)
@@ -249,9 +270,10 @@ def rm_dir(dir):
             os.remove(folderName+'/'+filename)
         os.rmdir(folderName)
 
-def split_code_file(dst_dir, dst_names, src_path, size):
+def split_code_file(dst_dir, dst_names, src_path, size, offset):
     with open(src_path, "rb") as src:
         print(src_path)
+        src.read(offset)
         for (dst_even_name, dst_odd_name) in dst_names:
             print("\t" + dst_even_name + ", " + dst_odd_name)
             dst_even_path = os.path.join(dst_dir, dst_even_name)
@@ -262,10 +284,11 @@ def split_code_file(dst_dir, dst_names, src_path, size):
                         dst_even.write(src.read(1))
                         dst_odd.write(src.read(1))
 
-def split_file_swab(dst_dir, dst_names, src_path, size):
+def split_file_swab(dst_dir, dst_names, src_path, size, offset):
     with open(src_path, "rb") as src:
         print(src_path)
         print(dst_names)
+        src.read(offset)
         for (dst_name) in dst_names:
             print("\t" + dst_name)
             dst_path = os.path.join(dst_dir, dst_name)
@@ -299,9 +322,10 @@ def decode_cps1_gfx(data):
         buf[i + 3] = (dwval >> 24) & 0xff
     return buf
 
-def split_gfx_file_4(dst_dir, dst_names, src_path, size, type):
+def split_gfx_file_4(dst_dir, dst_names, src_path, size, type, offset):
     with open(src_path, "rb") as src:
         print(src_path)
+        src.read(offset)
         if type == "cps1":
             print("Decoding CPS1 Graphics")
         for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in dst_names:
@@ -327,8 +351,8 @@ def split_gfx_file_4(dst_dir, dst_names, src_path, size, type):
                                     dst_3.write(src.read(2))
                                     dst_4.write(src.read(2))
                                     
-def split_gfx_file(dst_dir, dst_names, src_path, size, type):
-    split_gfx_file_4(dst_dir, dst_names, src_path, size, type)
+def split_gfx_file(dst_dir, dst_names, src_path, size, type, offset):
+    split_gfx_file_4(dst_dir, dst_names, src_path, size, type, offset)
 
 def split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, offset):
     with open(src_path, "rb") as src:
@@ -359,9 +383,10 @@ def split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, offset):
                                     dst_3.write(src.read(2))
                                     dst_4.write(src.read(2))
 
-def split_file(dst_dir, dst_names, src_path, size):
+def split_file(dst_dir, dst_names, src_path, size, offset):
     with open(src_path, "rb") as src:
         print(src_path)
+        src.read(offset)
         for dst_name in dst_names:
             print("\t" + dst_name)
             contents = src.read(size)
@@ -387,10 +412,10 @@ def split_game(root_dir, rom_dir, rom_name, src_game_name, code_files, split_fil
         os.mkdir(dst_dir)
     for (dst_names, src_ext, size) in code_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_code_file(dst_dir, dst_names, src_path, size)
+        split_code_file(dst_dir, dst_names, src_path, size, 0)
     for (dst_names, src_ext, size) in split_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+        split_file(dst_dir, dst_names, src_path, size, 0)
 
 #sf2ub,sfiiina,sfiii2n,sfiii3nr1
 def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
@@ -401,45 +426,81 @@ def split_game_alt1(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_
         print("Splitting CPS3 Files")
         for (dst_names, src_ext, size) in split_files:
             src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-            split_file(dst_dir, dst_names, src_path, size)
+            split_file(dst_dir, dst_names, src_path, size, 0)
     else:
         if code_files != None :
             for (dst_names, src_ext, size) in code_files:
-                if type == "snk" :
+                if type == "samsho" :
                     src_path = os.path.join(root_dir, src_game_name, src_ext)
+                    split_file_swab(dst_dir, dst_names, src_path, size, 0)
+                elif type == "snk":
+                    src_path = os.path.join(root_dir, src_game_name, src_ext)
+                    split_code_file(dst_dir, dst_names, src_path, size, 0)
                 else :
                     src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                split_code_file(dst_dir, dst_names, src_path, size)
+                    split_code_file(dst_dir, dst_names, src_path, size, 0)
         if gfx_files != None :
-            for (dst_names, src_ext, size) in gfx_files:
-                if type == "snk" :
-                    src_path = os.path.join(root_dir, src_game_name, src_ext)
-                    split_file_swab(dst_dir, dst_names, src_path, size)
-                else :
-                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                    split_gfx_file(dst_dir, dst_names, src_path, size, type)
+            if len(gfx_files[0]) == 3 :
+                for (dst_names, src_ext, size) in gfx_files:
+                    if type == "snk":
+                        src_path = os.path.join(root_dir, src_game_name, src_ext)
+                        split_file_swab(dst_dir, dst_names, src_path, size, 0)
+                    else :
+                        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                        split_gfx_file(dst_dir, dst_names, src_path, size, type, 0)
+            else :
+               for (dst_names, src_ext, size, offset) in gfx_files:
+                    if type == "snk":
+                        src_path = os.path.join(root_dir, src_game_name, src_ext)
+                        split_file_swab(dst_dir, dst_names, src_path, size, offset)
+                    elif  type == "samsho" :
+                        src_path = os.path.join(root_dir, src_game_name, src_ext)
+                        split_file_swab(dst_dir, dst_names, src_path, size, offset)
+                    else :
+                        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                        split_gfx_file(dst_dir, dst_names, src_path, size, type, offset) 
         if split_files != None :
-            for (dst_names, src_ext, size) in split_files:
-                if type == "snk" :
-                    src_path = os.path.join(root_dir, src_game_name, src_ext)
-                else :
-                    src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-                split_file(dst_dir, dst_names, src_path, size)
+            if len(split_files[0]) == 3 :
+                for (dst_names, src_ext, size) in split_files:
+                    if type != "snk" or type != "samsho" :
+                        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                    else :
+                        src_path = os.path.join(root_dir, src_game_name, src_ext)
+                    split_file(dst_dir, dst_names, src_path, size, 0)
+            else :
+                for (dst_names, src_ext, size, offset) in split_files:
+                    if type != "snk" or type != "samsho" :
+                        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+                    else :
+                        src_path = os.path.join(root_dir, src_game_name, src_ext)
+                    split_file(dst_dir, dst_names, src_path, size, offset)
 
 #sf2hf
 def split_game_alt2(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx_files, split_files, type):
     dst_dir = os.path.join(rom_dir, rom_name)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
-    for (dst_names, src_ext, size) in code_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file_swab(dst_dir, dst_names, src_path, size)
-    for (dst_names, src_ext, size) in gfx_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size, type)
-    for (dst_names, src_ext, size) in split_files:
-        src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+    if code_files != None :
+        for (dst_names, src_ext, size) in code_files:
+            if type != "snk" or type != "samsho" :
+                src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            else :
+                src_path = os.path.join(root_dir, src_game_name, src_ext)
+            split_file_swab(dst_dir, dst_names, src_path, size, 0)
+    if gfx_files != None :
+        for (dst_names, src_ext, size) in gfx_files:
+            if type != "snk" or type != "samsho" :
+                src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            else :
+                src_path = os.path.join(root_dir, src_game_name, src_ext)
+            split_gfx_file(dst_dir, dst_names, src_path, size, type, 0)
+    if split_files != None :
+        for (dst_names, src_ext, size) in split_files:
+            if type != "snk" or type != "samsho" :
+                src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
+            else :
+                src_path = os.path.join(root_dir, src_game_name, src_ext)
+            split_file(dst_dir, dst_names, src_path, size, 0)
 
 def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1_files, gfx2_files, gfx2_offset, split_files, type):
     dst_dir = os.path.join(rom_dir, rom_name)
@@ -447,16 +508,16 @@ def split_game_alt3(root_dir, rom_dir, rom_name, src_game_name, code_files, gfx1
         os.mkdir(dst_dir)
     for (dst_names, src_ext, size) in code_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file_swab(dst_dir, dst_names, src_path, size)
+        split_file_swab(dst_dir, dst_names, src_path, size, 0)
     for (dst_names, src_ext, size) in gfx1_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_gfx_file(dst_dir, dst_names, src_path, size, type)
+        split_gfx_file(dst_dir, dst_names, src_path, size, type, 0)
     for (dst_names, src_ext, size) in gfx2_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
         split_gfx_file_alt(dst_dir, dst_names, src_path, size, type, gfx2_offset)
     for (dst_names, src_ext, size) in split_files:
         src_path = os.path.join(root_dir, src_game_name, src_game_name + "." + src_ext)
-        split_file(dst_dir, dst_names, src_path, size)
+        split_file(dst_dir, dst_names, src_path, size, 0)
 
 def process_rom(root_dir, rom_dir, rom_name, conversion_type):
 	#create rom_dir if missing
@@ -511,6 +572,12 @@ def process_rom(root_dir, rom_dir, rom_name, conversion_type):
         else:
             unsupported(rom_dir, rom_name)
             return
+    elif conversion_type == "samsho" :
+        if rom_name=="samsho" :
+            split_game_alt1(root_dir, rom_dir, rom_name, "Main", samsho_code, samsho_gfx, samsho_files, "samsho")
+        else:
+            unsupported(rom_dir, rom_name)
+            return
     elif conversion_type == "snk40th" :
         if rom_name=="bbusters" :
             split_game_alt1(root_dir, rom_dir, rom_name, "DLC1", bbusters_code, bbusters_gfx, bbusters_files, "snk")
@@ -535,7 +602,7 @@ def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
     if conversion_type == None :
         conversion_type = "sf30th"
         
-    if conversion_type != "sf30th" and conversion_type != "sfa1up" and conversion_type != "snk40th":
+    if conversion_type != "sf30th" and conversion_type != "sfa1up" and conversion_type != "snk40th" and conversion_type != "samsho":
         print("Unsupported conversion type = " +conversion_type)
         return
 	
@@ -543,6 +610,8 @@ def begin_convert(root_dir, rom_dir, rom_name, conversion_type):
         print("No --rom argument passed.  Extracting all available.")
         if conversion_type == "snk40th" :
             rom_name = "bbusters"
+        elif conversion_type == "samsho" :
+            rom_name = "samsho"
         else :
             rom_name = "sf,sf2ub,sf2ceua,sf2t,sfiiina,sfiii2n,sfiii3nr1"
        
