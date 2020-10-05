@@ -82,6 +82,7 @@ def get_games():
     sf30th_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ceua.extracted_folder_name +".vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
     all_games.append(sf30th_sf2ceua)
     
+    #Need to change the folder path on this one.  Can't remember the file structure for Arcade1Up though.
     sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "StreetFighterII_CE", "sf2ceua")
     sfa1up_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
     sfa1up_sf2ceua.files.append(RenameGameFile(sfa1up_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
@@ -89,6 +90,44 @@ def get_games():
     sfa1up_sf2ceua.files.append(SplitGameFileSwab(sfa1up_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
     sfa1up_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sfa1up_sf2ceua.extracted_folder_name +".patch.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
     all_games.append(sfa1up_sf2ceua)
+    
+    sf30th_sf2t = Game("Street Fighter II': Hyper Fighting", conversion_type_streetfighter30th, "StreetFighterII_HF", "sf2t")
+    sf30th_sf2t.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
+    sf30th_sf2t.files.append(RenameGameFile(sf30th_sf2t.extracted_folder_name +".z80", "s92_09.bin"))
+    sf30th_sf2t.files.append(SplitGameFile(sf30th_sf2t.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sf30th_sf2t.files.append(SplitGameFileSwab(sf30th_sf2t.extracted_folder_name +".u.68k", [("sf2_23a"),("sf2_22.bin"),("sf2_21.bin")], 512 * 1024))
+    sf30th_sf2t.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2t.extracted_folder_name +".u.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")], 512 * 1024))    
+    all_games.append(sf30th_sf2t)
+    
+    sf30th_sfiiina = Game("Street Fighter III: New Generation", conversion_type_streetfighter30th, "StreetFighterIII", "sfiiina")
+    sf30th_sfiiina.compatibility.extend(["FB Neo"])
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s1", ["sfiii-simm1.0", "sfiii-simm1.1", "sfiii-simm1.2", "sfiii-simm1.3"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s3", ["sfiii-simm3.0", "sfiii-simm3.1", "sfiii-simm3.2", "sfiii-simm3.3", "sfiii-simm3.4", "sfiii-simm3.5", "sfiii-simm3.6", "sfiii-simm3.7"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s4", ["sfiii-simm4.0", "sfiii-simm4.1", "sfiii-simm4.2", "sfiii-simm4.3", "sfiii-simm4.4", "sfiii-simm4.5", "sfiii-simm4.6", "sfiii-simm4.7"], 2097152))
+    sf30th_sfiiina.files.append(SplitGameFile(sf30th_sfiiina.extracted_folder_name +".s5", ["sfiii-simm5.0", "sfiii-simm5.1"], 2097152))
+    sf30th_sfiiina.files.append(RenameGameFile(sf30th_sfiiina.extracted_folder_name +".bios", "sfiii_euro.29f400.u2"))
+    all_games.append(sf30th_sfiiina)
+    
+    sf30th_sfiii2n = Game("Street Fighter III: 2nd Impact", conversion_type_streetfighter30th, "StreetFighterIII_2ndImpact", "sfiii2n")
+    sf30th_sfiii2n.compatibility.extend(["FB Neo"])
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s1", ["sfiii2-simm1.0", "sfiii2-simm1.1", "sfiii2-simm1.2", "sfiii2-simm1.3"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s2", ["sfiii2-simm2.0", "sfiii2-simm2.1", "sfiii2-simm2.2", "sfiii2-simm2.3"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s3", ["sfiii2-simm3.0", "sfiii2-simm3.1", "sfiii2-simm3.2", "sfiii2-simm3.3", "sfiii2-simm3.4", "sfiii2-simm3.5", "sfiii2-simm3.6", "sfiii2-simm3.7"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s4", ["sfiii2-simm4.0", "sfiii2-simm4.1", "sfiii2-simm4.2", "sfiii2-simm4.3", "sfiii2-simm4.4", "sfiii2-simm4.5", "sfiii2-simm4.6", "sfiii2-simm4.7"], 2097152))
+    sf30th_sfiii2n.files.append(SplitGameFile(sf30th_sfiii2n.extracted_folder_name +".s5", ["sfiii2-simm5.0", "sfiii2-simm5.1", "sfiii2-simm5.2", "sfiii2-simm5.3", "sfiii2-simm5.4", "sfiii2-simm5.5", "sfiii2-simm5.6", "sfiii2-simm5.7"], 2097152))
+    sf30th_sfiii2n.files.append(RenameGameFile(sf30th_sfiii2n.extracted_folder_name +".bios", "sfiii2_usa.29f400.u2"))
+    all_games.append(sf30th_sfiii2n)
+    
+    sf30th_sfiii3nr1 = Game("Street Fighter III: 3rd Strike", conversion_type_streetfighter30th, "StreetFighterIII_3rdStrike", "sfiii3nr1")
+    sf30th_sfiii3nr1.compatibility.extend(["FB Neo"])
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".r1.s1", ["sfiii3-simm1.0", "sfiii3-simm1.1", "sfiii3-simm1.2", "sfiii3-simm1.3"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".r1.s2", ["sfiii3-simm2.0", "sfiii3-simm2.1", "sfiii3-simm2.2", "sfiii3-simm2.3"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s3", ["sfiii3-simm3.0", "sfiii3-simm3.1", "sfiii3-simm3.2", "sfiii3-simm3.3", "sfiii3-simm3.4", "sfiii3-simm3.5", "sfiii3-simm3.6", "sfiii3-simm3.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s4", ["sfiii3-simm4.0", "sfiii3-simm4.1", "sfiii3-simm4.2", "sfiii3-simm4.3", "sfiii3-simm4.4", "sfiii3-simm4.5", "sfiii3-simm4.6", "sfiii3-simm4.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s5", ["sfiii3-simm5.0", "sfiii3-simm5.1", "sfiii3-simm5.2", "sfiii3-simm5.3", "sfiii3-simm5.4", "sfiii3-simm5.5", "sfiii3-simm5.6", "sfiii3-simm5.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s6", ["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], 2097152))
+    sf30th_sfiii3nr1.files.append(RenameGameFile(sf30th_sfiii3nr1.extracted_folder_name +".bios", "sfiii3_usa.29f400.u2"))
+    all_games.append(sf30th_sfiii3nr1)
     
     return all_games
 
