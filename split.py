@@ -110,13 +110,13 @@ def get_games():
     sf30th_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ceua.extracted_folder_name +".vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
     all_games.append(sf30th_sf2ceua)
     
-    #Need to change the folder path on this one.  Can't remember the file structure for Arcade1Up though.
-    sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "StreetFighterII_CE", "sf2ceua")
+    #Need to change the folder path on this one.  zassets\Capcom\StreetFighterII_CE.zip on the device.  Assume zassets is selected as the extracted folder.  In the future unzip automatically.
+    sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "Capcom/StreetFighterII_CE.zip", "sf2ceua")
     sfa1up_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
-    sfa1up_sf2ceua.files.append(RenameGameFile(sfa1up_sf2ceua.extracted_folder_name +".z80", "s92_09.bin"))
-    sfa1up_sf2ceua.files.append(SplitGameFile(sfa1up_sf2ceua.extracted_folder_name +".oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
-    sfa1up_sf2ceua.files.append(SplitGameFileSwab(sfa1up_sf2ceua.extracted_folder_name +".ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
-    sfa1up_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sfa1up_sf2ceua.extracted_folder_name +".patch.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
+    sfa1up_sf2ceua.files.append(RenameGameFile("StreetFighterII_CE.z80", "s92_09.bin"))
+    sfa1up_sf2ceua.files.append(SplitGameFile("StreetFighterII_CE.oki", ["s92_18.bin", "s92_19.bin"], 128 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileSwab("StreetFighterII_CE.ua.68k", [("s92u-23a"),("sf2ce.22"),("s92_21a.bin")], 512 * 1024))
+    sfa1up_sf2ceua.files.append(SplitGameFileInterleave4Cps1("StreetFighterII_CE.patch.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
     all_games.append(sfa1up_sf2ceua)
     
     sf30th_sf2t = Game("Street Fighter II': Hyper Fighting", conversion_type_streetfighter30th, "StreetFighterII_HF", "sf2t")
@@ -412,13 +412,22 @@ def split_file_swab_offset(src_path, dst_dir, file):
 def zip_game(rom_dir, game):
     zipname=rom_dir+'/'+game.rom_name+'.zip'
     zipdir=rom_dir+'/'+game.rom_name
-    zipObj = zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED)
-    for folderName, subfolders, filenames in os.walk(zipdir):
-        for filename in filenames:
-            # Add file to zip
-            zipfileLocation=(zipdir+'/'+filename)
-            zipObj.write(zipfileLocation, filename)
+    with zipfile.ZipFile(zipname, 'w', compression=zipfile.ZIP_DEFLATED) as zipObj:
+        for folderName, subfolders, filenames in os.walk(zipdir):
+            for filename in filenames:
+                zipfileLocation=(zipdir+'/'+filename)
+                zipObj.write(zipfileLocation, filename)
     print(game.name + " has been zipped to " +zipname)
+    
+def unzip_game(root_dir, game):
+    zipname=root_dir+'/'+game.extracted_folder_name+'.zip'
+    if os.path.exists(zipname) == False :
+        print_if_debug("File not found: " +zipname)
+        return False
+    gamedir=root_dir+'/'+game.extracted_folder_name
+    with zipfile.ZipFile(zipname, 'r') as zipObj:
+        zipObj.extractall(gamedir)
+    print_if_debug(game.extracted_folder_name +".zip has been unzipped to " +gamedir)
 
 def print_if_debug(msg) :
     if debug == True :
@@ -442,18 +451,32 @@ def get_string_rom_name_list(games) :
     for game in games :
         gameNames.append(game.rom_name)
     return ", ".join(gameNames)
-        
+
+def check_overwrite(root_dir, game, overwrite) :
+    if overwrite == False :
+        rom_file_name = rom_dir+'/'+game.rom_name+'.zip'
+        print_if_debug("rom_file_name: " +rom_file_name)
+        if os.path.exists(rom_file_name) == True :
+            print(game.name +" already converted.")
+            game.converted = True
+            return false
+            
+    return true
+    
+def check_zip_exists_if_necessary(root_dir, game):
+    if "zip" in game.extracted_folder_name :
+        game.extracted_folder_name = game.extracted_folder_name.replace(".zip", "")
+        if unzip_game(root_dir,game) == False :
+            print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
+            return false
 
 def process_game_list(root_dir, game_list, rom_dir, overwrite):
     for game in game_list:
         print_if_debug("Overwrite: " +str(overwrite))
-        if overwrite == False :
-            rom_file_name = rom_dir+'/'+game.rom_name+'.zip'
-            print_if_debug("rom_file_name: " +rom_file_name)
-            if os.path.exists(rom_file_name) == True :
-                print(game.name +" already converted.")
-                game.converted = True
-                continue
+        if check_overwrite == False :
+            continue
+        if check_zip_exists_if_necessary == False :
+            continue
         if check_files_exist(root_dir, game) == False:
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found.")
             continue
@@ -526,7 +549,7 @@ def main(argc, argv):
     parser.add_argument("romFolderStr", help="Location for rom", type=str)
     parser.add_argument("--rom", "--r", help="rom name", type=str)
     parser.add_argument("--type", "--t", help="conversion type", type=str)
-    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default='False')
+    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default=False)
     parser.add_argument('--overwrite', "--o", help="enable debug", action='store_true', default=False)
     args = parser.parse_args()
 
