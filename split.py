@@ -200,6 +200,35 @@ def get_games():
     snk40th_ikari3.files.append(SplitGameFileEvenOdd(snk40th_ikari3.rom_name +".user1", [("ik3-1.c8", "ik3-4.c12")], 64 * 1024))
     all_games.append(snk40th_ikari3)
     
+    snk40th_joyfulr = Game("Joyful Road", conversion_type_snk40th, "Patch1", "joyfulr")
+    snk40th_joyfulr.compatibility.extend(["FB Neo, MAME untested"])
+    snk40th_joyfulr.files.append(SplitGameFile(snk40th_joyfulr.rom_name +".maincpu", ["m1.10e", "m2.10d"], 8192))    
+    snk40th_joyfulr.files.append(SplitGameFile(snk40th_joyfulr.rom_name +".maincpu", ["m1.10e", "m2.10d"], 8192))  
+    snk40th_joyfulr_audiocpu = RenameGameFile(snk40th_joyfulr.rom_name +".audiocpu", "mu.2j");
+    snk40th_joyfulr.files.append(snk40th_joyfulr_audiocpu) 
+    snk40th_joyfulr_gfx1 = SplitGameFile(snk40th_joyfulr.rom_name +".gfx1", ["s1.10a", "s2.10b"], 4096)
+    snk40th_joyfulr.files.append(snk40th_joyfulr_gfx1)  
+    snk40th_joyfulr_gfx2 = SplitGameFile(snk40th_joyfulr.rom_name +".gfx2", ["b1.2c", "b1.2b"], 4096) 
+    snk40th_joyfulr.files.append(snk40th_joyfulr_gfx2)
+    snk40th_joyfulr.files.append(SplitGameFile(snk40th_joyfulr.rom_name +".gfx3", ["f1j.1g", "f2j.3g", "f3j.5g"], 8192)) 
+    snk40th_joyfulr_gfx4 = RenameGameFile(snk40th_joyfulr.rom_name +".gfx4", "h");
+    snk40th_joyfulr.files.append(snk40th_joyfulr_gfx4)
+    snk40th_joyfulr_proms = RenameGameFile(snk40th_joyfulr.rom_name +".proms", "a2001.clr");
+    snk40th_joyfulr.files.append(snk40th_joyfulr_proms)
+    all_games.append(snk40th_joyfulr)
+    
+    snk40th_mnchmobl = Game("Munch Mobile", conversion_type_snk40th, "Patch1", "mnchmobl")
+    snk40th_mnchmobl.compatibility.extend(["FB Neo, MAME untested"])
+    snk40th_mnchmobl.files.append(SplitGameFile(snk40th_mnchmobl.rom_name +".maincpu", ["m1.10e", "m2.10d"], 8192))    
+    snk40th_mnchmobl.files.append(SplitGameFile(snk40th_mnchmobl.rom_name +".maincpu", ["m1.10e", "m2.10d"], 8192)) 
+    snk40th_mnchmobl.files.append(snk40th_joyfulr_audiocpu)  
+    snk40th_mnchmobl.files.append(snk40th_joyfulr_gfx1)
+    snk40th_mnchmobl.files.append(snk40th_joyfulr_gfx2)    
+    snk40th_mnchmobl.files.append(SplitGameFile(snk40th_mnchmobl.rom_name +".gfx3", ["f1.1g", "f2.3g", "f3.5g"], 8192))   
+    snk40th_mnchmobl.files.append(snk40th_joyfulr_gfx4) 
+    snk40th_mnchmobl.files.append(snk40th_joyfulr_proms)
+    all_games.append(snk40th_mnchmobl)
+    
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -415,8 +444,16 @@ def get_string_rom_name_list(games) :
     return ", ".join(gameNames)
         
 
-def process_game_list(root_dir, game_list, rom_dir):
+def process_game_list(root_dir, game_list, rom_dir, overwrite):
     for game in game_list:
+        print_if_debug("Overwrite: " +str(overwrite))
+        if overwrite == False :
+            rom_file_name = rom_dir+'/'+game.rom_name+'.zip'
+            print_if_debug("rom_file_name: " +rom_file_name)
+            if os.path.exists(rom_file_name) == True :
+                print(game.name +" already converted.")
+                game.converted = True
+                continue
         if check_files_exist(root_dir, game) == False:
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found.")
             continue
@@ -449,16 +486,16 @@ def process_game_list(root_dir, game_list, rom_dir):
         game.converted = True
         rm_dir(rom_dir+'/'+game.rom_name)
 
-def begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games):
+def begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games, overwrite):
     #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
         
     game_list = create_game_list(rom_name, conversion_type, all_games)
-    process_game_list(root_dir, game_list, rom_dir)
-    end_convert(game_list)
+    process_game_list(root_dir, game_list, rom_dir, overwrite)
+    end_convert(game_list, overwrite)
 
-def end_convert(game_list) :
+def end_convert(game_list, overwrite) :
     unsuccessfulList = []
     total = 0
     for game in game_list :
@@ -470,7 +507,10 @@ def end_convert(game_list) :
     unsuccessful = len(unsuccessfulList)
     successful = total-len(unsuccessfulList)
     print("Finished converting.")
-    print(str(successful) +"/" +str(total) +" converted successfully.")
+    if overwrite == False :
+        print(str(successful) +"/" +str(total) +" converted successfully (or already exist).")
+    else :
+        print(str(successful) +"/" +str(total) +" converted successfully.")
     if unsuccessful > 0 :
         print("Unsuccessful:")
         print("\n".join(unsuccessfulList))
@@ -486,7 +526,8 @@ def main(argc, argv):
     parser.add_argument("romFolderStr", help="Location for rom", type=str)
     parser.add_argument("--rom", "--r", help="rom name", type=str)
     parser.add_argument("--type", "--t", help="conversion type", type=str)
-    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default='false')
+    parser.add_argument('--debug', "--d", "--v", help="enable debug", action='store_true', default='False')
+    parser.add_argument('--overwrite', "--o", help="enable debug", action='store_true', default=False)
     args = parser.parse_args()
 
     root_dir = args.extractFolderStr
@@ -495,8 +536,9 @@ def main(argc, argv):
     conversion_type = args.type
     global debug
     debug = args.debug
+    overwrite = args.overwrite
     
-    begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games)
+    begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games, overwrite)
 
     exit(0)
 
