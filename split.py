@@ -593,6 +593,96 @@ def get_games():
     snk40th_vanguardj.files.append(snk40th_vanguard_speech_2)
     all_games.append(snk40th_vanguardj)
     
+    snk40th_asones = Game("Alpha Mission", conversion_type_snk40th, "Main", "Alpha Mission.nes")
+    snk40th_asones.compatibility.extend(["NES"])
+    snk40th_asones.files.append(RenameGameFile("ASO.nes", "Alpha Mission.nes"))
+    all_games.append(snk40th_asones)
+    
+    snk40th_asojpnes = Game("ASO: Armored Scrum Object (Japan)", conversion_type_snk40th, "Main", "ASO Armored Scrum Object (Japan).nes")
+    snk40th_asojpnes.compatibility.extend(["NES"])
+    snk40th_asojpnes.files.append(RenameGameFile("ASO_jp.nes", "ASO Armored Scrum Object (Japan).nes"))
+    all_games.append(snk40th_asojpnes)
+    
+    snk40th_athenanes = Game("Athena", conversion_type_snk40th, "Main", "Athena.nes")
+    snk40th_athenanes.compatibility.extend(["NES"])
+    snk40th_athenanes.files.append(RenameGameFile("Athena.nes", "Athena.nes"))
+    all_games.append(snk40th_athenanes)
+    
+    snk40th_athenajpnes = Game("Athena (Japan)", conversion_type_snk40th, "Main", "Athena_jp.nes")
+    snk40th_athenajpnes.compatibility.extend(["NES"])
+    snk40th_athenajpnes.files.append(RenameGameFile("Athena_jp.nes", "Athena (Japan).nes"))
+    all_games.append(snk40th_athenajpnes)
+    
+    snk40th_crystalisnes = Game("Crystalis", conversion_type_snk40th, "Main", "Crystalis.nes")
+    snk40th_crystalisnes.compatibility.extend(["NES"])
+    snk40th_crystalisnes.files.append(RenameGameFile("Crystalis.nes", "Crystalis.nes"))
+    all_games.append(snk40th_crystalisnes)
+        
+    snk40th_crystalisjpnes = Game("Crystalis (Japan)", conversion_type_snk40th, "Main", "Crystalis (Japan).nes")
+    snk40th_crystalisjpnes.compatibility.extend(["NES"])
+    snk40th_crystalisjpnes.files.append(RenameGameFile("Crystalis_jp.nes", "Crystalis (Japan).nes"))
+    all_games.append(snk40th_crystalisjpnes)
+    
+    snk40th_guerrillawarnes = Game("Guerrilla War", conversion_type_snk40th, "Main", "Guerrilla War.nes")
+    snk40th_guerrillawarnes.compatibility.extend(["NES"])
+    snk40th_guerrillawarnes.files.append(RenameGameFile("GuerrillaWar.nes", "Guerrilla War.nes"))
+    all_games.append(snk40th_guerrillawarnes)
+    
+    snk40th_guerrillawarjpnes = Game("Guevara (Japan)", conversion_type_snk40th, "Main", "Guevara (Japan).nes")
+    snk40th_guerrillawarjpnes.compatibility.extend(["NES"])
+    snk40th_guerrillawarjpnes.files.append(RenameGameFile("GuerrillaWar_jp.nes", "Guevara (Japan).nes"))
+    all_games.append(snk40th_guerrillawarjpnes)
+    
+    snk40th_ikarines = Game("Ikari Warriors", conversion_type_snk40th, "Main", "Ikari Warriors.nes")
+    snk40th_ikarines.compatibility.extend(["NES"])
+    snk40th_ikarines.files.append(RenameGameFile("Ikari.nes", "Ikari Warriors.nes"))
+    all_games.append(snk40th_ikarines)
+    
+    snk40th_ikarijpnes = Game("Ikari (Japan)", conversion_type_snk40th, "Main", "Ikari (Japan).nes")
+    snk40th_ikarijpnes.compatibility.extend(["NES"])
+    snk40th_ikarijpnes.files.append(RenameGameFile("Ikari_jp.nes", "Ikari (Japan).nes"))
+    all_games.append(snk40th_ikarijpnes)
+    
+    snk40th_ikari2nes = Game("Victory Road", conversion_type_snk40th, "Main", "Victory Road.nes")
+    snk40th_ikari2nes.compatibility.extend(["NES"])
+    snk40th_ikari2nes.files.append(RenameGameFile("Ikari2.nes", "Victory Road.nes"))
+    all_games.append(snk40th_ikari2nes)
+    
+    snk40th_ikari2jpnes = Game("Victory Road (Japan)", conversion_type_snk40th, "Main", "Victory Road (Japan).nes")
+    snk40th_ikari2jpnes.compatibility.extend(["NES"])
+    snk40th_ikari2jpnes.files.append(RenameGameFile("Ikari2_jp.nes", "Victory Road (Japan).nes"))
+    all_games.append(snk40th_ikari2jpnes)
+    
+    snk40th_ikari3nes = Game("Ikari III: The Rescue", conversion_type_snk40th, "Main", "Ikari III The Rescue.nes")
+    snk40th_ikari3nes.compatibility.extend(["NES"])
+    snk40th_ikari3nes.files.append(RenameGameFile("Ikari3.nes", "Ikari III The Rescue.nes"))
+    all_games.append(snk40th_ikari3nes)
+    
+    snk40th_ikari3jpnes = Game("Ikari III (Japan)", conversion_type_snk40th, "Main", "Ikari III (Japan).nes")
+    snk40th_ikari3jpnes.compatibility.extend(["NES"])
+    snk40th_ikari3jpnes.files.append(RenameGameFile("Ikari3_jp.nes", "Ikari III (Japan).nes"))
+    all_games.append(snk40th_ikari3jpnes)
+    
+    snk40th_tnkiiines = Game("Iron Tank", conversion_type_snk40th, "Main", ".Iron Tanknes")
+    snk40th_tnkiiines.compatibility.extend(["NES"])
+    snk40th_tnkiiines.files.append(RenameGameFile("IronTank.nes", "Iron Tank.nes"))
+    all_games.append(snk40th_tnkiiines)
+    
+    snk40th_tnkiiijpnes = Game("Great Tank (Japan)", conversion_type_snk40th, "Main", "Great Tank (Japan).nes")
+    snk40th_tnkiiijpnes.compatibility.extend(["NES"])
+    snk40th_tnkiiijpnes.files.append(RenameGameFile("IronTank_jp.nes", "Great Tank (Japan).nes"))
+    all_games.append(snk40th_tnkiiijpnes)
+    
+    snk40th_pownes = Game("P.O.W.: Prisoners of War", conversion_type_snk40th, "Main", "POW Prisoners of War.nes")
+    snk40th_pownes.compatibility.extend(["NES"])
+    snk40th_pownes.files.append(RenameGameFile("POW.nes", "POW. Prisoners of War.nes"))
+    all_games.append(snk40th_pownes)
+    
+    snk40th_powjpnes = Game("P.O.W.: Prisoners of War (Japan)", conversion_type_snk40th, "Main", "POW Prisoners of War (Japan).nes")
+    snk40th_powjpnes.compatibility.extend(["NES"])
+    snk40th_powjpnes.files.append(RenameGameFile("POW_jp.nes", "POW Prisoners of War (Japan).nes"))
+    all_games.append(snk40th_powjpnes)
+    
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -833,6 +923,10 @@ def check_zip_exists_if_necessary(root_dir, game):
         if unzip_game(root_dir,game) == False :
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
             return False
+            
+def zip_if_necessary(rom_dir, game):
+    if "." not in game.rom_name :
+        zip_game(rom_dir, game)
 
 def process_game_list(root_dir, game_list, rom_dir, overwrite):
     for game in game_list:
@@ -847,7 +941,10 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
         print("Converting: " +game.name)
         for file in game.files:
             src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
-            dst_dir = os.path.join(rom_dir, game.rom_name)
+            if "." not in game.rom_name :
+                dst_dir = os.path.join(rom_dir, game.rom_name)
+            else :
+                dst_dir = rom_dir
             if not os.path.exists(dst_dir):
                 os.mkdir(dst_dir)
             if isinstance(file, SplitGameFile):
@@ -868,7 +965,7 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
                 split_file_swab(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileSwabOffset) :
                 split_file_swab_offset(src_path, dst_dir, file)
-        zip_game(rom_dir, game)
+        zip_if_necessary(rom_dir, game)
         if len(game.compatibility) > 0 :
             print(game.name +" is compatible with " + ", ".join(game.compatibility))
         game.converted = True
