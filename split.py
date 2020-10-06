@@ -229,6 +229,12 @@ def get_games():
     snk40th_mnchmobl.files.append(snk40th_joyfulr_proms)
     all_games.append(snk40th_mnchmobl)
     
+    snk40th_ozmawars = Game("Ozma Wars", conversion_type_snk40th, "Patch1", "ozmawars")
+    snk40th_ozmawars.files.append(SplitGameFile(snk40th_ozmawars.rom_name +".maincpu", ["mw01", "mw02", "mw03", "mw04"], 2048))
+    snk40th_ozmawars.files.append(SplitGameFileOffset(snk40th_ozmawars.rom_name +".maincpu", ["mw05", "mw06"], 2048, 16384))
+    snk40th_ozmawars.files.append(SplitGameFile("moonbase.proms", ["01.1", "02.2"], 1024))  
+    all_games.append(snk40th_ozmawars)
+    
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -452,30 +458,30 @@ def get_string_rom_name_list(games) :
         gameNames.append(game.rom_name)
     return ", ".join(gameNames)
 
-def check_overwrite(root_dir, game, overwrite) :
+def check_overwrite(rom_dir, game, overwrite) :
     if overwrite == False :
         rom_file_name = rom_dir+'/'+game.rom_name+'.zip'
         print_if_debug("rom_file_name: " +rom_file_name)
         if os.path.exists(rom_file_name) == True :
             print(game.name +" already converted.")
             game.converted = True
-            return false
+            return False
             
-    return true
+    return True
     
 def check_zip_exists_if_necessary(root_dir, game):
     if "zip" in game.extracted_folder_name :
         game.extracted_folder_name = game.extracted_folder_name.replace(".zip", "")
         if unzip_game(root_dir,game) == False :
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
-            return false
+            return False
 
 def process_game_list(root_dir, game_list, rom_dir, overwrite):
     for game in game_list:
         print_if_debug("Overwrite: " +str(overwrite))
-        if check_overwrite == False :
+        if check_overwrite(rom_dir, game, overwrite) == False :
             continue
-        if check_zip_exists_if_necessary == False :
+        if check_zip_exists_if_necessary(root_dir, game) == False :
             continue
         if check_files_exist(root_dir, game) == False:
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found.")
@@ -505,7 +511,8 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
             elif isinstance(file, SplitGameFileSwabOffset) :
                 split_file_swab_offset(src_path, dst_dir, file)
         zip_game(rom_dir, game)
-        print(game.name +" is compatible with " + ", ".join(game.compatibility))
+        if len(game.compatibility) > 0 :
+            print(game.name +" is compatible with " + ", ".join(game.compatibility))
         game.converted = True
         rm_dir(rom_dir+'/'+game.rom_name)
 
