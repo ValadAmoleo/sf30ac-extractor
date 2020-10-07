@@ -138,6 +138,15 @@ def get_games():
     sf30th_sf2t.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2t.extracted_folder_name +".u.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")], 512 * 1024))    
     all_games.append(sf30th_sf2t)
     
+    sf30th_ssf2u = Game("Super Street Fighter II", conversion_type_streetfighter30th, "SuperStreetFighterII", "ssf2u")
+    sf30th_ssf2u.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
+    sf30th_ssf2u.files.append(SplitGameFileSwab(sf30th_ssf2u.extracted_folder_name +".u.68k", ["ssfu.03a", "ssfu.04a", "ssfu.05", "ssfu.06", "ssfu.07"], 512 * 1024)) #correct
+    sf30th_ssf2u.files.append(SplitGameFileInterleave4(sf30th_ssf2u.extracted_folder_name +".vrom", [("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m")], 2097152))
+    sf30th_ssf2u.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2u.extracted_folder_name +".vrom", [("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m")], 1048576, int("0x800000", 16)))
+    sf30th_ssf2u.files.append(SplitGameFile(sf30th_ssf2u.extracted_folder_name +".z80", ["ssf.01"], int("0x080000", 16))) 
+    sf30th_ssf2u.files.append(SplitGameFileSwab(sf30th_ssf2u.extracted_folder_name +".qs", ["ssf.q01", "ssf.q02", "ssf.q03", "ssf.q04", "ssf.q05", "ssf.q06", "ssf.q07", "ssf.q08"], int("0x080000", 16))) 
+    all_games.append(sf30th_ssf2u)
+    
     sf30th_ssf2t = Game("Super Street Fighter II Turbo", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
     sf30th_ssf2t.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
     sf30th_ssf2t.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
@@ -149,7 +158,7 @@ def get_games():
     all_games.append(sf30th_ssf2t)
     
     
-    sf30th_ssf2t_mame2010 = Game("Super Street Fighter II Turbo (MAME 2010)", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
+    sf30th_ssf2t_mame2010 = Game("Super Street Fighter II Turbo (MAME 2010)", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu-2010")
     sf30th_ssf2t_mame2010.compatibility.extend(["Garbled graphics", "MAME-2010"])
     sf30th_ssf2t_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
     sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.13m", "sfx.15m", "sfx.17m", "sfx.19m")], 2097152))
