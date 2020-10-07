@@ -58,6 +58,17 @@ class SplitGameFileInterleave4Cps1(GameFile):
         super().__init__(filename, output_filenames)
         self.size = size
        
+class SplitGameFileInterleave4(GameFile):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames)
+        self.size = size
+       
+class SplitGameFileInterleave4Offset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+       
 class SplitGameFileSwab(GameFile):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames)
@@ -110,7 +121,7 @@ def get_games():
     sf30th_sf2ceua.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2ceua.extracted_folder_name +".vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s92_10.bin","s92_11.bin", "s92_12.bin", "s92_13.bin")], 512 * 1024))    
     all_games.append(sf30th_sf2ceua)
     
-    #Need to change the folder path on this one.  zassets\Capcom\StreetFighterII_CE.zip on the device.  Assume zassets is selected as the extracted folder.  In the future unzip automatically.
+    #zassets\Capcom\StreetFighterII_CE.zip on the device.  Assume zassets is selected as the extracted folder.
     sfa1up_sf2ceua = Game("Street Fighter II' Champion Edition", conversion_type_streetfighterarcade1up, "Capcom/StreetFighterII_CE.zip", "sf2ceua")
     sfa1up_sf2ceua.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007"])
     sfa1up_sf2ceua.files.append(RenameGameFile("StreetFighterII_CE.z80", "s92_09.bin"))
@@ -126,6 +137,27 @@ def get_games():
     sf30th_sf2t.files.append(SplitGameFileSwab(sf30th_sf2t.extracted_folder_name +".u.68k", [("sf2_23a"),("sf2_22.bin"),("sf2_21.bin")], 512 * 1024))
     sf30th_sf2t.files.append(SplitGameFileInterleave4Cps1(sf30th_sf2t.extracted_folder_name +".u.vrom",[("s92_01.bin", "s92_02.bin", "s92_03.bin", "s92_04.bin"),("s92_05.bin", "s92_06.bin", "s92_07.bin", "s92_08.bin"),("s2t_10.bin", "s2t_11.bin", "s2t_12.bin", "s2t_13.bin")], 512 * 1024))    
     all_games.append(sf30th_sf2t)
+    
+    sf30th_ssf2t = Game("Super Street Fighter II Turbo", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
+    sf30th_ssf2t.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
+    sf30th_ssf2t.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
+    sf30th_ssf2t.files.append(SplitGameFileInterleave4(sf30th_ssf2t.extracted_folder_name +".vrom", [("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m")], 2097152))
+    sf30th_ssf2t.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m")], 1048576, int("0x800000", 16)))
+    sf30th_ssf2t.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0xc00000", 16)))
+    sf30th_ssf2t.files.append(SplitGameFile(sf30th_ssf2t.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
+    sf30th_ssf2t.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
+    all_games.append(sf30th_ssf2t)
+    
+    
+    sf30th_ssf2t_mame2010 = Game("Super Street Fighter II Turbo (MAME 2010)", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
+    sf30th_ssf2t_mame2010.compatibility.extend(["Garbled graphics", "MAME-2010"])
+    sf30th_ssf2t_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
+    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.13m", "sfx.15m", "sfx.17m", "sfx.19m")], 2097152))
+    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.14m", "sfx.16m", "sfx.18m", "sfx.20m")], 1048576, int("0x800000", 16)))
+    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0xc00000", 16)))
+    sf30th_ssf2t_mame2010.files.append(SplitGameFile(sf30th_ssf2t.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
+    sf30th_ssf2t_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
+    all_games.append(sf30th_ssf2t_mame2010)
     
     sf30th_sfiiina = Game("Street Fighter III: New Generation", conversion_type_streetfighter30th, "StreetFighterIII", "sfiiina")
     sf30th_sfiiina.compatibility.extend(["FB Neo"])
@@ -684,7 +716,7 @@ def get_games():
     all_games.append(snk40th_powjpnes)
     
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
-    samsho_samsho.compatibility.extend(["Nothing - Garbled Graphics"])
+    samsho_samsho.compatibility.extend(["Garbled Graphics", "FB Neo", "MAME-2015"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
     samsho_samsho.files.append(RenameGameFile(samsho_samsho.rom_name +".cslot1_fixed", "045-s1.s1"))
     samsho_samsho.files.append(SplitGameFile(samsho_samsho.rom_name +".cslot1_ymsnd", ["045-v1.v1", "045-v2.v2"], 2097152))
@@ -694,22 +726,22 @@ def get_games():
     all_games.append(samsho_samsho)
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
-    samsho_samsho2.compatibility.extend(["Nothing - Garbled Graphics, Broken 063-p1.p1 file."])
-    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
-    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
-    samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
-    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #Perfect
+    samsho_samsho2.compatibility.extend(["Doesn't Load, Broken 063-p1.p1 file.", "FB Neo", "MAME-2015"])
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #correct
+    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #correct
+    samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
     samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1"))
     samsho_samsho2.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
     all_games.append(samsho_samsho2)
     
     samsho_samsho2k = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2k")
     samsho_samsho2k.compatibility.extend(["Nothing - Garbled Graphics, Missing Files."])
-    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #Perfect
-    samsho_samsho2k.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #Perfect
-    samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #Perfect
-    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #Perfect
-    samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #perfect
+    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #correct
+    samsho_samsho2k.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #correct
+    samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
+    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
+    samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #correct
     samsho_samsho2k.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
     all_games.append(samsho_samsho2k)
     
@@ -814,6 +846,48 @@ def split_file_interleave_4_cps1(src_path, dst_dir, file):
                                 dst_2.write(data[2:4])
                                 dst_3.write(data[4:6])
                                 dst_4.write(data[6:8])
+                
+def split_file_interleave_4(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            dst_path_3 = os.path.join(dst_dir, dst_name_3)
+            dst_path_4 = os.path.join(dst_dir, dst_name_4)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    with open(dst_path_3, "wb") as dst_3:
+                        with open(dst_path_4, "wb") as dst_4:
+                            for i in range(file.size // 2):
+                                data = src.read(8)
+                                dst_1.write(data[0:2])
+                                dst_2.write(data[2:4])
+                                dst_3.write(data[4:6])
+                                dst_4.write(data[6:8])
+                                
+def split_file_interleave_4_offset(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            dst_path_3 = os.path.join(dst_dir, dst_name_3)
+            dst_path_4 = os.path.join(dst_dir, dst_name_4)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    with open(dst_path_3, "wb") as dst_3:
+                        with open(dst_path_4, "wb") as dst_4:
+                            for i in range(file.size // 2):
+                                data = src.read(8)
+                                dst_1.write(data[0:2])
+                                dst_2.write(data[2:4])
+                                dst_3.write(data[4:6])
+                                dst_4.write(data[6:8])
+
 
 def decode_cps1_gfx(data):
     buf = bytearray(data)
@@ -959,6 +1033,10 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
                 rename_file(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFileOffset):
                 rename_file_offset(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleave4) :
+                split_file_interleave_4(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleave4Offset) :
+                split_file_interleave_4_offset(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileInterleave4Cps1) :
                 split_file_interleave_4_cps1(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileSwab) :
