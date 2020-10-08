@@ -781,6 +781,16 @@ def get_games():
     samsho_samsho4.files.append(SplitGameFileUnswizzle("SamuraiShodown4_NGM.sprites.swizzled", [("222-c1.c1", "222-c2.c2"), ("222-c3.c3", "222-c4.c4"), ("222-c5.c5", "222-c6.c6"), ("222-c7.c7", "222-c8.c8")], 2097152 * 2))
     all_games.append(samsho_samsho4)
     
+    samsho_neogeo = Game("Neo-Geo BIOS", conversion_type_samuraishowdowncollection, "Main", "neogeo")
+    samsho_neogeo.files.append(RenameGameFile(samsho_neogeo.rom_name +".audiobios", "sm1.sm1"))
+    samsho_neogeo.files.append(RenameGameFile(samsho_neogeo.rom_name +".fixedbios", "sfix.sfix"))
+    samsho_neogeo.files.append(RenameGameFile(samsho_neogeo.rom_name +".zoomy", "000-lo.lo")) 
+    samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.euro", ["sp-e.sp1"], 128 * 1024))
+    samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.japan", ["sp-s2.sp1"], 128 * 1024))
+    samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.japan", ["sp-s3.sp1"], 128 * 1024))
+    samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.us", ["usa_2slt.bin"], 128 * 1024))
+    all_games.append(samsho_neogeo)
+    
     return all_games
 
 def create_game_list(rom_name, conversion_type, all_games):
