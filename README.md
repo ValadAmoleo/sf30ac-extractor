@@ -1,5 +1,5 @@
 # sf30ac-extractor
-Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection  (music, artwork, fonts, etc).  Also creates working ROMs from Street Fighter 30th Anniversary Collection and SNK 40th Anniversary Collection.
+Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection (ROMs, music, artwork, fonts, etc).
 
 ## Requirements
 You need to have a python 3 available somewhere
