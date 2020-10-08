@@ -33,14 +33,14 @@ class GameFile(object):
         self.filename = filename
         self.output_filenames = output_filenames
 
-class RenameGameFile(GameFile):
-    def __init__(self, filename, output_filename):
-        super().__init__(filename, output_filename)
-        
 class RenameGameFileOffset(GameFile):
     def __init__(self, filename, output_filename, offset):
         super().__init__(filename, output_filename)
         self.offset = offset
+
+class RenameGameFile(RenameGameFileOffset):
+    def __init__(self, filename, output_filename):
+        super().__init__(filename, output_filename, 0)
         
 class SplitGameFileEvenOddOffset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
@@ -48,48 +48,59 @@ class SplitGameFileEvenOddOffset(GameFile):
         self.size = size
         self.offset = offset
         
-class SplitGameFileEvenOdd(GameFile):
+class SplitGameFileEvenOdd(SplitGameFileEvenOddOffset):
     def __init__(self, filename, output_filenames, size):
-        super().__init__(filename, output_filenames)
-        self.size = size
+        super().__init__(filename, output_filenames, size, 0)
        
-class SplitGameFileInterleave4Cps1(GameFile):
-    def __init__(self, filename, output_filenames, size):
-        super().__init__(filename, output_filenames)
-        self.size = size
-       
-class SplitGameFileInterleave4(GameFile):
-    def __init__(self, filename, output_filenames, size):
-        super().__init__(filename, output_filenames)
-        self.size = size
-       
-class SplitGameFileInterleave4Offset(GameFile):
+class SplitGameFileInterleave4Cps1Offset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
         self.size = size
         self.offset = offset
        
-class SplitGameFileSwab(GameFile):
+class SplitGameFileInterleave4Cps1(SplitGameFileInterleave4Cps1Offset):
     def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
+        
+class SplitGameFileInterleave4Offset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
         self.size = size
+        self.offset = offset
+        
+class SplitGameFileInterleave4(SplitGameFileInterleave4Offset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
         
 class SplitGameFileSwabOffset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
         self.size = size
         self.offset = offset
-       
-class SplitGameFile(GameFile):
+        
+class SplitGameFileSwab(SplitGameFileSwabOffset):
     def __init__(self, filename, output_filenames, size):
-        super().__init__(filename, output_filenames)
-        self.size = size
+        super().__init__(filename, output_filenames, size, 0)
        
 class SplitGameFileOffset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
         self.size = size
         self.offset = offset
+        
+class SplitGameFile(SplitGameFileOffset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
+        
+class SplitGameFileUnswizzleOffset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+        
+class SplitGameFileUnswizzle(SplitGameFileUnswizzleOffset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
 
 def get_games():
     all_games = []
@@ -139,34 +150,32 @@ def get_games():
     all_games.append(sf30th_sf2t)
     
     sf30th_ssf2u = Game("Super Street Fighter II", conversion_type_streetfighter30th, "SuperStreetFighterII", "ssf2u")
-    sf30th_ssf2u.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
+    sf30th_ssf2u.compatibility.extend(["Garbled graphics and broken audio", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
     sf30th_ssf2u.files.append(SplitGameFileSwab(sf30th_ssf2u.extracted_folder_name +".u.68k", ["ssfu.03a", "ssfu.04a", "ssfu.05", "ssfu.06", "ssfu.07"], 512 * 1024)) #correct
     sf30th_ssf2u.files.append(SplitGameFileInterleave4(sf30th_ssf2u.extracted_folder_name +".vrom", [("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m")], 2097152))
     sf30th_ssf2u.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2u.extracted_folder_name +".vrom", [("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m")], 1048576, int("0x800000", 16)))
     sf30th_ssf2u.files.append(SplitGameFile(sf30th_ssf2u.extracted_folder_name +".z80", ["ssf.01"], int("0x080000", 16))) 
-    sf30th_ssf2u.files.append(SplitGameFileSwab(sf30th_ssf2u.extracted_folder_name +".qs", ["ssf.q01", "ssf.q02", "ssf.q03", "ssf.q04", "ssf.q05", "ssf.q06", "ssf.q07", "ssf.q08"], int("0x080000", 16))) 
+    sf30th_ssf2u.files.append(SplitGameFile(sf30th_ssf2u.extracted_folder_name +".qs", ["ssf.q01", "ssf.q02", "ssf.q03", "ssf.q04", "ssf.q05", "ssf.q06", "ssf.q07", "ssf.q08"], int("0x080000", 16)))  #correct
     all_games.append(sf30th_ssf2u)
     
-    sf30th_ssf2t = Game("Super Street Fighter II Turbo", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
-    sf30th_ssf2t.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
-    sf30th_ssf2t.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
-    sf30th_ssf2t.files.append(SplitGameFileInterleave4(sf30th_ssf2t.extracted_folder_name +".vrom", [("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m")], 2097152))
-    sf30th_ssf2t.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m")], 1048576, int("0x800000", 16)))
-    sf30th_ssf2t.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0xc00000", 16)))
-    sf30th_ssf2t.files.append(SplitGameFile(sf30th_ssf2t.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
-    sf30th_ssf2t.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
-    all_games.append(sf30th_ssf2t)
+    sf30th_ssf2tu = Game("Super Street Fighter II Turbo", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu")
+    sf30th_ssf2tu.compatibility.extend(["Garbled graphics", "MAME-2001", "MAME-2003", "MAME-2003 Plus", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009"])
+    sf30th_ssf2tu.files.append(SplitGameFileSwab(sf30th_ssf2tu.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
+    sf30th_ssf2tu.files.append(SplitGameFileInterleave4Cps1(sf30th_ssf2tu.extracted_folder_name +".vrom", [("ssf.13m", "ssf.15m", "ssf.17m", "ssf.19m")], 2097152))
+    sf30th_ssf2tu.files.append(SplitGameFileInterleave4Cps1Offset(sf30th_ssf2tu.extracted_folder_name +".vrom", [("ssf.14m", "ssf.16m", "ssf.18m", "ssf.20m"), ("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0x800000", 16)))
+    sf30th_ssf2tu.files.append(SplitGameFile(sf30th_ssf2tu.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
+    sf30th_ssf2tu.files.append(SplitGameFileSwab(sf30th_ssf2tu.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
+    all_games.append(sf30th_ssf2tu)
     
     
-    sf30th_ssf2t_mame2010 = Game("Super Street Fighter II Turbo (MAME 2010)", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu-2010")
-    sf30th_ssf2t_mame2010.compatibility.extend(["Garbled graphics", "MAME-2010"])
-    sf30th_ssf2t_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
-    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.13m", "sfx.15m", "sfx.17m", "sfx.19m")], 2097152))
-    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.14m", "sfx.16m", "sfx.18m", "sfx.20m")], 1048576, int("0x800000", 16)))
-    sf30th_ssf2t_mame2010.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2t.extracted_folder_name +".vrom", [("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0xc00000", 16)))
-    sf30th_ssf2t_mame2010.files.append(SplitGameFile(sf30th_ssf2t.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
-    sf30th_ssf2t_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2t.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
-    all_games.append(sf30th_ssf2t_mame2010)
+    sf30th_ssf2tu_mame2010 = Game("Super Street Fighter II Turbo (MAME 2010)", conversion_type_streetfighter30th, "SuperStreetFighterIITurbo", "ssf2tu-2010")
+    sf30th_ssf2tu_mame2010.compatibility.extend(["Garbled graphics", "MAME-2010"])
+    sf30th_ssf2tu_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2tu.extracted_folder_name +".u.68k", ["sfxu.03c", "sfxu.04a", "sfxu.05", "sfxu.06a", "sfxu.07", "sfxu.08", "sfx.09"], 512 * 1024)) #correct
+    sf30th_ssf2tu_mame2010.files.append(SplitGameFileInterleave4(sf30th_ssf2tu.extracted_folder_name +".vrom", [("sfx.13m", "sfx.15m", "sfx.17m", "sfx.19m")], 2097152))
+    sf30th_ssf2tu_mame2010.files.append(SplitGameFileInterleave4Offset(sf30th_ssf2tu.extracted_folder_name +".vrom", [("sfx.14m", "sfx.16m", "sfx.18m", "sfx.20m"), ("sfx.21m", "sfx.23m", "sfx.25m", "sfx.27m")], 1048576, int("0x800000", 16)))
+    sf30th_ssf2tu_mame2010.files.append(SplitGameFile(sf30th_ssf2tu.extracted_folder_name +".z80", ["sfx.01", "sfx.02"], 128 * 1024)) #correct
+    sf30th_ssf2tu_mame2010.files.append(SplitGameFileSwab(sf30th_ssf2tu.extracted_folder_name +".qs", ["sfx.11m", "sfx.12m"], 2097152)) #correct
+    all_games.append(sf30th_ssf2tu_mame2010)
     
     sf30th_sfiiina = Game("Street Fighter III: New Generation", conversion_type_streetfighter30th, "StreetFighterIII", "sfiiina")
     sf30th_sfiiina.compatibility.extend(["FB Neo"])
@@ -730,8 +739,8 @@ def get_games():
     samsho_samsho.files.append(RenameGameFile(samsho_samsho.rom_name +".cslot1_fixed", "045-s1.s1"))
     samsho_samsho.files.append(SplitGameFile(samsho_samsho.rom_name +".cslot1_ymsnd", ["045-v1.v1", "045-v2.v2"], 2097152))
     samsho_samsho.files.append(SplitGameFileSwab(samsho_samsho.rom_name +".cslot1_maincpu", [("045-p1.p1"),("045-pg2.sp2")], 1048576))
-    samsho_samsho.files.append(SplitGameFileSwab("SamuraiShodown_NGM.sprites.swizzled", ("045-c1.c1", "045-c2.c2", "045-c3.c3", "045-c4.c4"), 2097152))
-    samsho_samsho.files.append(SplitGameFileSwabOffset("SamuraiShodown_NGM.sprites.swizzled", ("045-c51.c5", "045-c61.c6"), 1048576, 2097152 * 4))
+    samsho_samsho.files.append(SplitGameFileUnswizzle("SamuraiShodown_NGM.sprites.swizzled", [("045-c1.c1", "045-c2.c2"), ("045-c3.c3", "045-c4.c4")], 2097152))
+    samsho_samsho.files.append(SplitGameFileUnswizzleOffset("SamuraiShodown_NGM.sprites.swizzled", [("045-c51.c5", "045-c61.c6")], 1048576, 2097152 * 4))
     all_games.append(samsho_samsho)
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
@@ -741,7 +750,7 @@ def get_games():
     samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
     samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
     samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1"))
-    samsho_samsho2.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
+    samsho_samsho2.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
     all_games.append(samsho_samsho2)
     
     samsho_samsho2k = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2k")
@@ -751,7 +760,7 @@ def get_games():
     samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
     samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
     samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #correct
-    samsho_samsho2k.files.append(SplitGameFileSwab("SamuraiShodown2_NGM.sprites.swizzled", ("063-c1.c1", "063-c2.c2", "063-c3.c3", "063-c4.c4", "063-c5.c5", "063-c6.c6", "063-c7.c7", "063-c8.c8"), 2097152))
+    samsho_samsho2k.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
     all_games.append(samsho_samsho2k)
     
     return all_games
@@ -774,35 +783,15 @@ def create_game_list(rom_name, conversion_type, all_games):
     
 def rename_file(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
-        contents = src.read()
-        dst_path = os.path.join(dst_dir, file.output_filenames)
-        with open(dst_path, "wb") as dst:
-            dst.write(contents)
-            
-def rename_file_offset(src_path, dst_dir, file):
-    with open(src_path, "rb") as src:
         src.read(file.offset)
         contents = src.read()
         dst_path = os.path.join(dst_dir, file.output_filenames)
         with open(dst_path, "wb") as dst:
             dst.write(contents)
-
+  
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         print_if_debug(src_path)
-        for (dst_even_name, dst_odd_name) in file.output_filenames:
-            print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
-            dst_even_path = os.path.join(dst_dir, dst_even_name)
-            dst_odd_path = os.path.join(dst_dir, dst_odd_name)
-            with open(dst_even_path, "wb") as dst_even:
-                with open(dst_odd_path, "wb") as dst_odd:
-                    for i in range(file.size):
-                        dst_even.write(src.read(1))
-                        dst_odd.write(src.read(1))
-                        
-def split_file_evenodd_offset(src_path, dst_dir, file):
-    with open(src_path, "rb") as src:
-        print_if_debug(src_path)
         src.read(file.offset)
         for (dst_even_name, dst_odd_name) in file.output_filenames:
             print_if_debug("\t" + dst_even_name + ", " + dst_odd_name)
@@ -813,18 +802,8 @@ def split_file_evenodd_offset(src_path, dst_dir, file):
                     for i in range(file.size):
                         dst_even.write(src.read(1))
                         dst_odd.write(src.read(1))
-                        
+                 
 def split_file(src_path, dst_dir, file):
-    with open(src_path, "rb") as src:
-        print_if_debug(src_path)
-        for dst_name in file.output_filenames:
-            print_if_debug("\t" + dst_name)
-            contents = src.read(file.size)
-            dst_path = os.path.join(dst_dir, dst_name)
-            with open(dst_path, "wb") as dst:
-                dst.write(contents)
-                
-def split_file_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         print_if_debug(src_path)
         src.read(file.offset)
@@ -838,9 +817,9 @@ def split_file_offset(src_path, dst_dir, file):
 def split_file_interleave_4_cps1(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         print_if_debug(src_path)
-        print_if_debug("Decoding CPS1 Graphics")
+        src.read(file.offset)
         for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
-            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            print("Decoding CPS1 Graphics for " + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4 +". This will take a while...")
             dst_path_1 = os.path.join(dst_dir, dst_name_1)
             dst_path_2 = os.path.join(dst_dir, dst_name_2)
             dst_path_3 = os.path.join(dst_dir, dst_name_3)
@@ -859,26 +838,6 @@ def split_file_interleave_4_cps1(src_path, dst_dir, file):
 def split_file_interleave_4(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         print_if_debug(src_path)
-        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
-            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
-            dst_path_1 = os.path.join(dst_dir, dst_name_1)
-            dst_path_2 = os.path.join(dst_dir, dst_name_2)
-            dst_path_3 = os.path.join(dst_dir, dst_name_3)
-            dst_path_4 = os.path.join(dst_dir, dst_name_4)
-            with open(dst_path_1, "wb") as dst_1:
-                with open(dst_path_2, "wb") as dst_2:
-                    with open(dst_path_3, "wb") as dst_3:
-                        with open(dst_path_4, "wb") as dst_4:
-                            for i in range(file.size // 2):
-                                data = src.read(8)
-                                dst_1.write(data[0:2])
-                                dst_2.write(data[2:4])
-                                dst_3.write(data[4:6])
-                                dst_4.write(data[6:8])
-                                
-def split_file_interleave_4_offset(src_path, dst_dir, file):
-    with open(src_path, "rb") as src:
-        print_if_debug(src_path)
         src.read(file.offset)
         for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
             print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
@@ -897,6 +856,77 @@ def split_file_interleave_4_offset(src_path, dst_dir, file):
                                 dst_3.write(data[4:6])
                                 dst_4.write(data[6:8])
 
+
+def split_file_unswizzle(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        src.read(file.offset)
+        for (dst_name_1, dst_name_2) in file.output_filenames:
+            print("Unswizzling " +dst_name_1  +" and " +dst_name_2 +". This will take a while...")
+            read = 0
+            lastPercentage = 0
+            print("0%", end = ' ', flush=True)
+            while read < file.size * 2 :
+                tile = src.read(128)
+                currentPercentage = int(100 * float(read)/float(file.size * 2));
+                if currentPercentage != lastPercentage :
+                    if currentPercentage%10 == 0 :
+                        print(str(currentPercentage) +"%", end = ' ', flush=True)
+                    lastPercentage = currentPercentage
+                read += 128
+                block = 0
+                while block < 4 :
+                    if block == 0 :
+                        x_offset = 4
+                        y_offset = 0
+                    elif block == 1 :
+                        x_offset = 4
+                        y_offset = 8
+                    elif block == 2 :
+                        x_offset = 0
+                        y_offset = 0
+                    elif block == 3:
+                        x_offset = 0
+                        y_offset = 8
+                    block += 1
+                    row = 0
+                    while row < 8 :
+                        planes = bytearray(4)
+                        planes[0] = 0
+                        planes[1] = 0
+                        planes[2] = 0
+                        planes[3] = 0
+                        offset = bytes([tile[x_offset + (y_offset * 8) + (row * 8)]])
+                        i = 3
+                        while i >= 0 :
+                            data = offset
+                            endianType = "little"
+                            planes[0] = planes[0] << 1
+                            planes[0] = planes[0] | ((int.from_bytes(data, endianType) >> 4) & 0x1)
+                            planes[0] = planes[0] << 1
+                            planes[0] = planes[0] | ((int.from_bytes(data, endianType) >> 0) & 0x1)
+                            planes[1] = planes[1] << 1
+                            planes[1] = planes[1] | ((int.from_bytes(data, endianType) >> 5) & 0x1)
+                            planes[1] = planes[1] << 1
+                            planes[1] = planes[1] | ((int.from_bytes(data, endianType) >> 1) & 0x1)
+                            planes[2] = planes[2] << 1
+                            planes[2] = planes[2] | ((int.from_bytes(data, endianType) >> 6) & 0x1)
+                            planes[2] = planes[2] << 1
+                            planes[2] = planes[2] | ((int.from_bytes(data, endianType) >> 2) & 0x1)
+                            planes[3] = planes[3] << 1
+                            planes[3] = planes[3] | ((int.from_bytes(data, endianType) >> 7) & 0x1)
+                            planes[3] = planes[3] << 1
+                            planes[3] = planes[3] | ((int.from_bytes(data, endianType) >> 3) & 0x1)
+                            i -= 1
+                        dst_path_1 = os.path.join(dst_dir, dst_name_1)
+                        dst_path_2 = os.path.join(dst_dir, dst_name_2)
+                        with open(dst_path_1, "ab") as dst_1:
+                            with open(dst_path_2, "ab") as dst_2:
+                                dst_1.write(bytes([planes[0]]))
+                                dst_1.write(bytes([planes[1]]))
+                                dst_2.write(bytes([planes[2]]))
+                                dst_2.write(bytes([planes[3]]))
+                        row += 1
+            print("100%")
 
 def decode_cps1_gfx(data):
     buf = bytearray(data)
@@ -922,16 +952,7 @@ def decode_cps1_gfx(data):
     return buf
     
 def split_file_swab(src_path, dst_dir, file):
-    with open(src_path, "rb") as src:
-        for (dst_name) in file.output_filenames:
-            print_if_debug("\t" + dst_name)
-            dst_path = os.path.join(dst_dir, dst_name)
-            with open(dst_path, "wb") as dst:
-                for i in range(file.size // 2):
-                    byte0=src.read(1)
-                    byte1=src.read(1)
-                    dst.write(byte1)
-                    dst.write(byte0)
+    split_file_swab_offset(src_path, dst_dir, file)
                     
 def split_file_swab_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
@@ -1030,28 +1051,20 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
                 dst_dir = rom_dir
             if not os.path.exists(dst_dir):
                 os.mkdir(dst_dir)
-            if isinstance(file, SplitGameFile):
+            if isinstance(file, SplitGameFile) or isinstance(file, SplitGameFileOffset):
                 split_file(src_path, dst_dir, file)
-            if isinstance(file, SplitGameFileOffset):
-                split_file_offset(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileEvenOdd):
+            elif isinstance(file, SplitGameFileEvenOdd) or isinstance(file, SplitGameFileEvenOddOffset) :
                 split_file_evenodd(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileEvenOddOffset) :
-                split_file_evenodd_offset(src_path, dst_dir, file)
-            elif isinstance(file, RenameGameFile):
+            elif isinstance(file, RenameGameFile) or isinstance(file, RenameGameFileOffset):
                 rename_file(src_path, dst_dir, file)
-            elif isinstance(file, RenameGameFileOffset):
-                rename_file_offset(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileInterleave4) :
+            elif isinstance(file, SplitGameFileInterleave4) or isinstance(file, SplitGameFileInterleave4Offset) :
                 split_file_interleave_4(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileInterleave4Offset) :
-                split_file_interleave_4_offset(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileInterleave4Cps1) :
+            elif isinstance(file, SplitGameFileInterleave4Cps1) or  isinstance(file, SplitGameFileInterleave4Cps1Offset) :
                 split_file_interleave_4_cps1(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileSwab) :
+            elif isinstance(file, SplitGameFileSwab) or isinstance(file, SplitGameFileSwabOffset) :
                 split_file_swab(src_path, dst_dir, file)
-            elif isinstance(file, SplitGameFileSwabOffset) :
-                split_file_swab_offset(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileUnswizzle) or isinstance(file, SplitGameFileUnswizzleOffset) :
+                split_file_unswizzle(src_path, dst_dir, file)
         zip_if_necessary(rom_dir, game)
         if len(game.compatibility) > 0 :
             print(game.name +" is compatible with " + ", ".join(game.compatibility))
