@@ -738,7 +738,7 @@ def get_games():
     all_games.append(snk40th_powjpnes)
     
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
-    samsho_samsho3.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
+    samsho_samsho.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
     samsho_samsho.files.append(RenameGameFile(samsho_samsho.rom_name +".cslot1_fixed", "045-s1.s1"))
     samsho_samsho.files.append(SplitGameFile(samsho_samsho.rom_name +".cslot1_ymsnd", ["045-v1.v1", "045-v2.v2"], 2097152))
@@ -771,7 +771,7 @@ def get_games():
     all_games.append(samsho_samsho3)
     
     samsho_samsho4 = Game("Samurai Shodown IV: Amakusa's Revenge", conversion_type_samuraishowdowncollection, "Main", "samsho4")
-    samsho_samsho3.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
+    samsho_samsho4.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
     samsho_samsho4.files.append(RenameGameFileOffset(samsho_samsho4.rom_name +".cslot1_audiocpu", "222-m1.m1", int("0x10000", 16)))
     samsho_samsho4.files.append(RenameGameFile(samsho_samsho4.rom_name +".cslot1_fixed", "222-s1.s1"))
     samsho_samsho4.files.append(SplitGameFile(samsho_samsho4.rom_name +".cslot1_ymsnd", ["222-v1.v1", "222-v2.v2"], int(0x400000)))
@@ -1106,6 +1106,9 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
         rm_dir(rom_dir+'/'+game.rom_name)
 
 def begin_convert(root_dir, rom_dir, rom_name, conversion_type, all_games, overwrite):
+    if all_games == None:
+        all_games = get_games()
+
     #create rom_dir if missing
     if not os.path.exists(rom_dir):
         os.mkdir(rom_dir)
