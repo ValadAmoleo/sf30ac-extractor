@@ -734,7 +734,7 @@ def get_games():
     all_games.append(snk40th_powjpnes)
     
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
-    samsho_samsho.compatibility.extend(["Garbled Graphics", "FB Neo", "MAME-2015"])
+    samsho_samsho.compatibility.extend(["FB Neo", "MAME-2015"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
     samsho_samsho.files.append(RenameGameFile(samsho_samsho.rom_name +".cslot1_fixed", "045-s1.s1"))
     samsho_samsho.files.append(SplitGameFile(samsho_samsho.rom_name +".cslot1_ymsnd", ["045-v1.v1", "045-v2.v2"], 2097152))
@@ -745,23 +745,13 @@ def get_games():
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
     samsho_samsho2.compatibility.extend(["Doesn't Load, Broken 063-p1.p1 file.", "FB Neo", "MAME-2015"])
-    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #correct
-    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #correct
-    samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
-    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
-    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1"))
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024)))
+    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1"))
+    samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152))
+    samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3))
+    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1")) #broken
     samsho_samsho2.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
     all_games.append(samsho_samsho2)
-    
-    samsho_samsho2k = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2k")
-    samsho_samsho2k.compatibility.extend(["Nothing - Garbled Graphics, Missing Files."])
-    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024))) #correct
-    samsho_samsho2k.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1")) #correct
-    samsho_samsho2k.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152)) #correct
-    samsho_samsho2k.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3)) #correct
-    samsho_samsho2k.files.append(SplitGameFileSwabOffset(samsho_samsho2.rom_name +".cslot1_maincpu", ["063-ep2-kan.ep2"], 524288, 524288)) #correct
-    samsho_samsho2k.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
-    all_games.append(samsho_samsho2k)
     
     return all_games
 
@@ -864,6 +854,8 @@ def split_file_unswizzle(src_path, dst_dir, file):
             print("Unswizzling " +dst_name_1  +" and " +dst_name_2 +". This will take a while...")
             read = 0
             lastPercentage = 0
+            byteBuffer1 = bytearray()
+            byteBuffer2 = bytearray()
             print("0%", end = ' ', flush=True)
             while read < file.size * 2 :
                 tile = bytearray(src.read(128))
@@ -918,16 +910,18 @@ def split_file_unswizzle(src_path, dst_dir, file):
                             planes[3] = planes[3] << 1
                             planes[3] = planes[3] | ((int.from_bytes(data, endianType) >> 3) & 0x1)
                             i -= 1
-                        dst_path_1 = os.path.join(dst_dir, dst_name_1)
-                        dst_path_2 = os.path.join(dst_dir, dst_name_2)
-                        with open(dst_path_1, "ab") as dst_1:
-                            with open(dst_path_2, "ab") as dst_2:
-                                dst_1.write(bytes([planes[0]]))
-                                dst_1.write(bytes([planes[1]]))
-                                dst_2.write(bytes([planes[2]]))
-                                dst_2.write(bytes([planes[3]]))
+                        byteBuffer1.extend(bytes([planes[0]]))
+                        byteBuffer1.extend(bytes([planes[1]]))
+                        byteBuffer2.extend(bytes([planes[2]]))
+                        byteBuffer2.extend(bytes([planes[3]]))
                         row += 1
             print("100%")
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    dst_1.write(byteBuffer1)
+                    dst_2.write(byteBuffer2)
 
 def decode_cps1_gfx(data):
     buf = bytearray(data)
