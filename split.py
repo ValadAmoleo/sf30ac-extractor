@@ -866,7 +866,7 @@ def split_file_unswizzle(src_path, dst_dir, file):
             lastPercentage = 0
             print("0%", end = ' ', flush=True)
             while read < file.size * 2 :
-                tile = src.read(128)
+                tile = bytearray(src.read(128))
                 currentPercentage = int(100 * float(read)/float(file.size * 2));
                 if currentPercentage != lastPercentage :
                     if currentPercentage%10 == 0 :
@@ -895,11 +895,12 @@ def split_file_unswizzle(src_path, dst_dir, file):
                         planes[1] = 0
                         planes[2] = 0
                         planes[3] = 0
-                        offset = bytes([tile[x_offset + (y_offset * 8) + (row * 8)]])
+                        endianType = "little"
+                        currentOffset = x_offset + (y_offset * 8) + (row * 8);
+                        offset = tile[currentOffset:currentOffset+4]
                         i = 3
                         while i >= 0 :
-                            data = offset
-                            endianType = "little"
+                            data = offset[i].to_bytes(1,endianType)
                             planes[0] = planes[0] << 1
                             planes[0] = planes[0] | ((int.from_bytes(data, endianType) >> 4) & 0x1)
                             planes[0] = planes[0] << 1
