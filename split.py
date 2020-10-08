@@ -748,7 +748,7 @@ def get_games():
     all_games.append(samsho_samsho)
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
-    samsho_samsho2.compatibility.extend(["Doesn't Load, Broken 063-p1.p1 file.", "FB Neo", "MAME-2015"])
+    samsho_samsho2.compatibility.extend(["FB Neo", "MAME-2015"])
     samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024)))
     samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1"))
     samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152))
@@ -757,6 +757,29 @@ def get_games():
     samsho_samsho2.files.append(JoinGameFile(["063-p1.p1c", "063-p1.p1d", "063-p1.p1a", "063-p1.p1b"], "063-p1.p1"))
     samsho_samsho2.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
     all_games.append(samsho_samsho2)
+    
+    samsho_samsho3 = Game("Samurai Shodown III: Blades of Blood", conversion_type_samuraishowdowncollection, "Main", "samsho3")
+    samsho_samsho3.compatibility.extend(["FB Neo", "MAME-2015"])
+    samsho_samsho3.files.append(RenameGameFileOffset(samsho_samsho3.rom_name +".cslot1_audiocpu", "087-m1.m1", int("0x10000", 16)))
+    samsho_samsho3.files.append(RenameGameFile(samsho_samsho3.rom_name +".cslot1_fixed", "087-s1.s1")) 
+    samsho_samsho3.files.append(SplitGameFile(samsho_samsho3.rom_name +".cslot1_ymsnd", ["087-v1.v1"], 4194304)) 
+    samsho_samsho3.files.append(RenameGameFileOffset(samsho_samsho3.rom_name +".cslot1_ymsnd", "087-v2.v2", 4194304)) 
+    samsho_samsho3.files.append(SplitGameFileSwab(samsho_samsho3.rom_name +".cslot1_maincpu", [("087-epr.ep1"),("087-epr.ep2"),("087-epr.ep3"),("087-epr.ep4")], 524288)) 
+    samsho_samsho3.files.append(SplitGameFileSwabOffset(samsho_samsho3.rom_name +".cslot1_maincpu", [("087-p5.p5")], 524288 * 2, 524288*4)) 
+    samsho_samsho3.files.append(SplitGameFileUnswizzle("SamuraiShodown3_NGM.sprites.swizzled", [("087-c1.c1", "087-c2.c2"), ("087-c3.c3", "087-c4.c4"), ("087-c5.c5", "087-c6.c6")], 2097152 * 2)) 
+    samsho_samsho3.files.append(SplitGameFileUnswizzleOffset("SamuraiShodown3_NGM.sprites.swizzled", [("087-c7.c7", "087-c8.c8")], 1048576, (2097152 * 2) * 6)) 
+    all_games.append(samsho_samsho3)
+    
+    samsho_samsho4 = Game("Samurai Shodown IV: Amakusa's Revenge", conversion_type_samuraishowdowncollection, "Main", "samsho4")
+    samsho_samsho4.compatibility.extend(["FB Neo", "MAME-2015"])
+    samsho_samsho4.files.append(RenameGameFileOffset(samsho_samsho4.rom_name +".cslot1_audiocpu", "222-m1.m1", int("0x10000", 16)))
+    samsho_samsho4.files.append(RenameGameFile(samsho_samsho4.rom_name +".cslot1_fixed", "222-s1.s1"))
+    samsho_samsho4.files.append(SplitGameFile(samsho_samsho4.rom_name +".cslot1_ymsnd", ["222-v1.v1", "222-v2.v2"], int(0x400000)))
+    samsho_samsho4.files.append(RenameGameFileOffset(samsho_samsho4.rom_name +".cslot1_ymsnd", "222-v3.v3", int(0x400000)*2))
+    samsho_samsho4.files.append(SplitGameFileSwab(samsho_samsho4.rom_name +".cslot1_maincpu", [("222-p1.p1")], 1048576))
+    samsho_samsho4.files.append(SplitGameFileSwabOffset(samsho_samsho4.rom_name +".cslot1_maincpu", [("222-p2.sp2")], 4194304, 1048576))
+    samsho_samsho4.files.append(SplitGameFileUnswizzle("SamuraiShodown4_NGM.sprites.swizzled", [("222-c1.c1", "222-c2.c2"), ("222-c3.c3", "222-c4.c4"), ("222-c5.c5", "222-c6.c6"), ("222-c7.c7", "222-c8.c8")], 2097152 * 2))
+    all_games.append(samsho_samsho4)
     
     return all_games
 
