@@ -42,6 +42,10 @@ class RenameGameFile(RenameGameFileOffset):
     def __init__(self, filename, output_filename):
         super().__init__(filename, output_filename, 0)
         
+class JoinGameFile(GameFile):
+    def __init__(self, filenames, output_filename):
+        super().__init__(filenames, output_filename)
+        
 class SplitGameFileEvenOddOffset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
@@ -749,7 +753,8 @@ def get_games():
     samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_fixed", "063-s1.s1"))
     samsho_samsho2.files.append(SplitGameFile(samsho_samsho2.rom_name +".cslot1_ymsnd", ["063-v1.v1", "063-v2.v2", "063-v3.v3"], 2097152))
     samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_ymsnd", "063-v4.v4", 2097152 * 3))
-    samsho_samsho2.files.append(RenameGameFile(samsho_samsho2.rom_name +".cslot1_maincpu", "063-p1.p1")) #broken
+    samsho_samsho2.files.append(SplitGameFileSwab(samsho_samsho2.rom_name +".cslot1_maincpu", [("063-p1.p1a"),("063-p1.p1b"),("063-p1.p1c"),("063-p1.p1d")], int(2097152 / 4)))
+    samsho_samsho2.files.append(JoinGameFile(["063-p1.p1c", "063-p1.p1d", "063-p1.p1a", "063-p1.p1b"], "063-p1.p1"))
     samsho_samsho2.files.append(SplitGameFileUnswizzle("SamuraiShodown2_NGM.sprites.swizzled", [("063-c1.c1", "063-c2.c2"), ("063-c3.c3", "063-c4.c4"), ("063-c5.c5", "063-c6.c6"), ("063-c7.c7", "063-c8.c8")], 2097152))
     all_games.append(samsho_samsho2)
     
@@ -778,6 +783,15 @@ def rename_file(src_path, dst_dir, file):
         dst_path = os.path.join(dst_dir, file.output_filenames)
         with open(dst_path, "wb") as dst:
             dst.write(contents)
+
+def join_file(dst_dir, file) :
+    outfilePath = os.path.join(dst_dir, file.output_filenames)
+    with open(outfilePath, 'wb') as outfile:
+        for fname in file.filename :
+            path = os.path.join(dst_dir, fname)
+            with open(path, "rb") as infile:
+                outfile.write(infile.read())
+            os.remove(path)           
   
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
@@ -945,11 +959,8 @@ def decode_cps1_gfx(data):
         buf[i + 2] = (dwval >> 16) & 0xff
         buf[i + 3] = (dwval >> 24) & 0xff
     return buf
-    
+                        
 def split_file_swab(src_path, dst_dir, file):
-    split_file_swab_offset(src_path, dst_dir, file)
-                    
-def split_file_swab_offset(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         src.read(file.offset)
         for (dst_name) in file.output_filenames:
@@ -994,6 +1005,8 @@ def rm_dir(dir):
         
 def check_files_exist(root_dir, game):
     for file in game.files:
+        if isinstance(file, JoinGameFile) :
+            continue
         src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
         if os.path.exists(src_path) == False :
             print_if_debug("File not found: " +src_path)
@@ -1039,6 +1052,9 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
             continue
         print("Converting: " +game.name)
         for file in game.files:
+            if isinstance(file, JoinGameFile) :
+                join_file(dst_dir, file)
+                continue
             src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
             if "." not in game.rom_name :
                 dst_dir = os.path.join(rom_dir, game.rom_name)
