@@ -33,6 +33,10 @@ class GameFile(object):
         self.filename = filename
         self.output_filenames = output_filenames
 
+class DuplicateGameFile(GameFile):
+    def __init__(self, filename, output_filename):
+        super().__init__(filename, output_filename)
+
 class RenameGameFileOffset(GameFile):
     def __init__(self, filename, output_filename, offset):
         super().__init__(filename, output_filename)
@@ -45,6 +49,11 @@ class RenameGameFile(RenameGameFileOffset):
 class JoinGameFile(GameFile):
     def __init__(self, filenames, output_filename):
         super().__init__(filenames, output_filename)
+        
+class JoinGameFileInterleave2(GameFile):
+    def __init__(self, filenames, output_filename, size):
+        super().__init__(filenames, output_filename)
+        self.size = size;
         
 class SplitGameFileEvenOddOffset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
@@ -66,6 +75,26 @@ class SplitGameFileInterleave4Cps1(SplitGameFileInterleave4Cps1Offset):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames, size, 0)
         
+class SplitGameFileInterleaveSpecial1Offset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+        
+class SplitGameFileInterleaveSpecial1(SplitGameFileInterleaveSpecial1Offset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
+        
+class SplitGameFileInterleave4x4Offset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+        
+class SplitGameFileInterleave4x4(SplitGameFileInterleave4x4Offset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
+        
 class SplitGameFileInterleave4Offset(GameFile):
     def __init__(self, filename, output_filenames, size, offset):
         super().__init__(filename, output_filenames)
@@ -73,6 +102,16 @@ class SplitGameFileInterleave4Offset(GameFile):
         self.offset = offset
         
 class SplitGameFileInterleave4(SplitGameFileInterleave4Offset):
+    def __init__(self, filename, output_filenames, size):
+        super().__init__(filename, output_filenames, size, 0)
+        
+class SplitGameFileInterleave2Offset(GameFile):
+    def __init__(self, filename, output_filenames, size, offset):
+        super().__init__(filename, output_filenames)
+        self.size = size
+        self.offset = offset
+        
+class SplitGameFileInterleave2(SplitGameFileInterleave2Offset):
     def __init__(self, filename, output_filenames, size):
         super().__init__(filename, output_filenames, size, 0)
         
@@ -210,6 +249,25 @@ def get_games():
     sf30th_sfiii3nr1.files.append(SplitGameFile(sf30th_sfiii3nr1.extracted_folder_name +".s6", ["sfiii3-simm6.0", "sfiii3-simm6.1", "sfiii3-simm6.2", "sfiii3-simm6.3", "sfiii3-simm6.4", "sfiii3-simm6.5", "sfiii3-simm6.6", "sfiii3-simm6.7"], 2097152))
     sf30th_sfiii3nr1.files.append(RenameGameFile(sf30th_sfiii3nr1.extracted_folder_name +".bios", "sfiii3_usa.29f400.u2"))
     all_games.append(sf30th_sfiii3nr1)
+    
+    snk40th_aso = Game("ASO: Armored Scrum Object", conversion_type_snk40th, "Main", "aso")
+    snk40th_aso.compatibility.extend(["Incorrect graphics, FB Neo, MAME untested"])
+    snk40th_aso.files.append(SplitGameFile("ASOArmoredScrumObject.as.0.z80", ["aso_p1.d8", "aso_p2.d7", "aso_p3.d5"], int("0x4000", 16)))
+    snk40th_aso.files.append(SplitGameFile("ASOArmoredScrumObject.as.1.z80", ["aso_p4.d3", "p5.d2", "p6.d1"], int("0x4000", 16)))
+    snk40th_aso.files.append(SplitGameFile("ASOArmoredScrumObject.2.z80", ["p7.f4", "p8.f3", "p9.f2"], int("0x4000", 16)))
+    snk40th_aso.files.append(RenameGameFile("ASOArmoredScrumObject.as.tx", "aso_p14.h1"))
+    snk40th_aso.files.append(RenameGameFile("ASOArmoredScrumObject.bg", "p10.h14"))
+    snk40th_aso.files.append(SplitGameFile("ASOArmoredScrumObject.sp", ["p11.h11b", "p11.h11a", "p12.h9b", "p12.h9a", "p13.h8b", "p13.h8a"], int("0x4000", 16)))
+    snk40th_aso.files.append(JoinGameFile(["p11.h11a", "p11.h11b"], "p11.h11"))
+    snk40th_aso.files.append(JoinGameFile(["p12.h9a", "p12.h9b"], "p12.h9"))
+    snk40th_aso.files.append(JoinGameFile(["p13.h8a", "p13.h8b"], "p13.h8"))
+    snk40th_aso.files.append(SplitGameFileInterleaveSpecial1("ASOArmoredScrumObject.pal", [("tmp2", "tmp1", "tmp0", "tmp3")], 512))
+    snk40th_aso.files.append(DuplicateGameFile("tmp3", ["tmp3b", "tmp3c"]))
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3", "tmp2")], "mb7122h.f12", 1024))
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3b", "tmp1")], "mb7122h.f13", 1024))
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3c", "tmp0")], "mb7122h.f14", 1024))
+    all_games.append(snk40th_aso)
+    
     
     snk40th_bbusters = Game("Beast Busters", conversion_type_snk40th, "DLC1", "bbusters")
     snk40th_bbusters.compatibility.extend(["FB Neo, MAME untested"])
@@ -816,6 +874,14 @@ def rename_file(src_path, dst_dir, file):
         dst_path = os.path.join(dst_dir, file.output_filenames)
         with open(dst_path, "wb") as dst:
             dst.write(contents)
+            
+def duplicate_file(dst_dir, file):
+    infilePath = os.path.join(dst_dir, file.filename)
+    for fname in file.output_filenames :
+        with open(infilePath, 'rb') as infile:
+            path = os.path.join(dst_dir, fname)
+            with open(path, "wb") as outfile:
+                outfile.write(infile.read())
 
 def join_file(dst_dir, file) :
     outfilePath = os.path.join(dst_dir, file.output_filenames)
@@ -824,7 +890,23 @@ def join_file(dst_dir, file) :
             path = os.path.join(dst_dir, fname)
             with open(path, "rb") as infile:
                 outfile.write(infile.read())
-            os.remove(path)           
+            os.remove(path) 
+
+def join_file_interleave_2(dst_dir, file) :
+    outfilePath = os.path.join(dst_dir, file.output_filenames)
+    with open(outfilePath, 'wb') as outfile:
+        for(src_in_1, src_in_2) in file.filename :
+            src_in_1_path = os.path.join(dst_dir, src_in_1)
+            src_in_2_path = os.path.join(dst_dir, src_in_2)
+            read = 0
+            with open(src_in_1_path, "rb") as infile1:
+                with open(src_in_2_path, "rb") as infile2:
+                    while read < (file.size) :
+                        outfile.write(infile1.read(4))
+                        outfile.write(infile2.read(4))
+                        read += 8
+            #os.remove(src_in_1_path)        
+            #os.remove(src_in_2_path)           
   
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
@@ -872,6 +954,78 @@ def split_file_interleave_4_cps1(src_path, dst_dir, file):
                                 dst_3.write(data[4:6])
                                 dst_4.write(data[6:8])
                 
+def split_file_interleave_special_1(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            dst_path_3 = os.path.join(dst_dir, dst_name_3)
+            dst_path_4 = os.path.join(dst_dir, dst_name_4)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    with open(dst_path_3, "wb") as dst_3:
+                        with open(dst_path_4, "wb") as dst_4:
+                            wrote = 0
+                            endianType = "little"
+                            while wrote < (file.size):
+                                data = src.read(32)
+                                wrote += 8
+                                dst_1.write(data[4].to_bytes(1,endianType))
+                                dst_1.write(data[5].to_bytes(1,endianType))
+                                dst_1.write(data[6].to_bytes(1,endianType))
+                                dst_1.write(data[0].to_bytes(1,endianType))
+                                dst_2.write(data[1].to_bytes(1,endianType))
+                                dst_2.write(data[2].to_bytes(1,endianType))
+                                dst_2.write(data[12].to_bytes(1,endianType))
+                                dst_2.write(data[13].to_bytes(1,endianType))
+                                dst_3.write(data[7].to_bytes(1,endianType))
+                                dst_3.write(data[3].to_bytes(1,endianType))
+                                dst_3.write(data[14].to_bytes(1,endianType))
+                                dst_3.write(data[15].to_bytes(1,endianType))
+                                dst_4.write(data[8].to_bytes(1,endianType))
+                                dst_4.write(data[9].to_bytes(1,endianType))
+                                dst_4.write(data[10].to_bytes(1,endianType))
+                                dst_4.write(data[11].to_bytes(1,endianType))
+                                dst_1.write(data[20].to_bytes(1,endianType))
+                                dst_1.write(data[21].to_bytes(1,endianType))
+                                dst_1.write(data[22].to_bytes(1,endianType))
+                                dst_1.write(data[16].to_bytes(1,endianType))
+                                dst_2.write(data[17].to_bytes(1,endianType))
+                                dst_2.write(data[18].to_bytes(1,endianType))
+                                dst_2.write(data[28].to_bytes(1,endianType))
+                                dst_2.write(data[29].to_bytes(1,endianType))
+                                dst_3.write(data[23].to_bytes(1,endianType))
+                                dst_3.write(data[19].to_bytes(1,endianType))
+                                dst_3.write(data[30].to_bytes(1,endianType))
+                                dst_3.write(data[31].to_bytes(1,endianType))
+                                dst_4.write(data[24].to_bytes(1,endianType))
+                                dst_4.write(data[25].to_bytes(1,endianType))
+                                dst_4.write(data[26].to_bytes(1,endianType))
+                                dst_4.write(data[27].to_bytes(1,endianType))
+def split_file_interleave_4_4(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for (dst_name_1, dst_name_2, dst_name_3, dst_name_4) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2 + ", " + dst_name_3 + ", " + dst_name_4)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            dst_path_3 = os.path.join(dst_dir, dst_name_3)
+            dst_path_4 = os.path.join(dst_dir, dst_name_4)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    with open(dst_path_3, "wb") as dst_3:
+                        with open(dst_path_4, "wb") as dst_4:
+                            for i in range(file.size):
+                                data = src.read(16)
+                                dst_1.write(data[0:4])
+                                dst_2.write(data[4:8])
+                                dst_3.write(data[8:12])
+                                dst_4.write(data[12:16])
+                
 def split_file_interleave_4(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
         print_if_debug(src_path)
@@ -892,6 +1046,21 @@ def split_file_interleave_4(src_path, dst_dir, file):
                                 dst_2.write(data[2:4])
                                 dst_3.write(data[4:6])
                                 dst_4.write(data[6:8])
+                
+def split_file_interleave_2(src_path, dst_dir, file):
+    with open(src_path, "rb") as src:
+        print_if_debug(src_path)
+        src.read(file.offset)
+        for (dst_name_1, dst_name_2) in file.output_filenames:
+            print_if_debug("\t" + dst_name_1 + ", " + dst_name_2)
+            dst_path_1 = os.path.join(dst_dir, dst_name_1)
+            dst_path_2 = os.path.join(dst_dir, dst_name_2)
+            with open(dst_path_1, "wb") as dst_1:
+                with open(dst_path_2, "wb") as dst_2:
+                    for i in range(file.size // 2):
+                        data = src.read(8)
+                        dst_1.write(data[0:4])
+                        dst_2.write(data[4:8])
 
 
 def split_file_unswizzle(src_path, dst_dir, file):
@@ -1031,6 +1200,7 @@ def print_if_debug(msg) :
         print(msg)
 
 def rm_dir(dir):
+    return
     for folderName, subfolders, filenames in os.walk(dir):
         for filename in filenames:
             os.remove(folderName+'/'+filename)
@@ -1038,7 +1208,7 @@ def rm_dir(dir):
         
 def check_files_exist(root_dir, game):
     for file in game.files:
-        if isinstance(file, JoinGameFile) :
+        if isinstance(file, JoinGameFile) or isinstance(file, JoinGameFileInterleave2) or isinstance(file, DuplicateGameFile):
             continue
         src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
         if os.path.exists(src_path) == False :
@@ -1088,6 +1258,12 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
             if isinstance(file, JoinGameFile) :
                 join_file(dst_dir, file)
                 continue
+            elif isinstance(file, JoinGameFileInterleave2) :
+                join_file_interleave_2(dst_dir, file)
+                continue
+            elif isinstance(file, DuplicateGameFile) :
+                duplicate_file(dst_dir, file)
+                continue
             src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
             if "." not in game.rom_name :
                 dst_dir = os.path.join(rom_dir, game.rom_name)
@@ -1101,8 +1277,14 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
                 split_file_evenodd(src_path, dst_dir, file)
             elif isinstance(file, RenameGameFile) or isinstance(file, RenameGameFileOffset):
                 rename_file(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleave4x4) or isinstance(file, SplitGameFileInterleave4x4Offset) :
+                split_file_interleave_4_4(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileInterleave4) or isinstance(file, SplitGameFileInterleave4Offset) :
                 split_file_interleave_4(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleave2) or isinstance(file, SplitGameFileInterleave2Offset) :
+                split_file_interleave_2(src_path, dst_dir, file)
+            elif isinstance(file, SplitGameFileInterleaveSpecial1) or isinstance(file, SplitGameFileInterleaveSpecial1Offset) :
+                split_file_interleave_special_1(src_path, dst_dir, file)                
             elif isinstance(file, SplitGameFileInterleave4Cps1) or  isinstance(file, SplitGameFileInterleave4Cps1Offset) :
                 split_file_interleave_4_cps1(src_path, dst_dir, file)
             elif isinstance(file, SplitGameFileSwab) or isinstance(file, SplitGameFileSwabOffset) :
