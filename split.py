@@ -905,8 +905,8 @@ def join_file_interleave_2(dst_dir, file) :
                         outfile.write(infile1.read(4))
                         outfile.write(infile2.read(4))
                         read += 8
-            #os.remove(src_in_1_path)        
-            #os.remove(src_in_2_path)           
+            os.remove(src_in_1_path)        
+            os.remove(src_in_2_path)           
   
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
@@ -1200,7 +1200,6 @@ def print_if_debug(msg) :
         print(msg)
 
 def rm_dir(dir):
-    return
     for folderName, subfolders, filenames in os.walk(dir):
         for filename in filenames:
             os.remove(folderName+'/'+filename)
