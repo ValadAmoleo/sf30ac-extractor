@@ -15,6 +15,8 @@ conversion_type_streetfighter30th = "sf30th"
 conversion_type_streetfighterarcade1up = "sfa1up"
 conversion_type_snk40th = "snk40th"
 conversion_type_samuraishowdowncollection = "samsho"
+conversion_type_arcadearchivesneogeo = "aaneogeo"
+conversion_type_segaages = "segaages"
 
 debug = None
 
@@ -261,11 +263,11 @@ def get_games():
     snk40th_aso.files.append(JoinGameFile(["p11.h11a", "p11.h11b"], "p11.h11"))
     snk40th_aso.files.append(JoinGameFile(["p12.h9a", "p12.h9b"], "p12.h9"))
     snk40th_aso.files.append(JoinGameFile(["p13.h8a", "p13.h8b"], "p13.h8"))
-    snk40th_aso.files.append(SplitGameFileInterleaveSpecial1("ASOArmoredScrumObject.pal", [("tmp2", "tmp1", "tmp0", "tmp3")], 512))
+    snk40th_aso.files.append(SplitGameFileInterleaveSpecial1("ASOArmoredScrumObject.pal", [("tmp2", "tmp1", "tmp0", "tmp3")], 512)) #incorrect
     snk40th_aso.files.append(DuplicateGameFile("tmp3", ["tmp3b", "tmp3c"]))
-    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3", "tmp2")], "mb7122h.f12", 1024))
-    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3b", "tmp1")], "mb7122h.f13", 1024))
-    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3c", "tmp0")], "mb7122h.f14", 1024))
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3", "tmp2")], "mb7122h.f12", 1024))#incorrect
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3b", "tmp1")], "mb7122h.f13", 1024))#incorrect
+    snk40th_aso.files.append(JoinGameFileInterleave2([("tmp3c", "tmp0")], "mb7122h.f14", 1024))#incorrect
     all_games.append(snk40th_aso)
     
     
@@ -805,6 +807,16 @@ def get_games():
     samsho_samsho.files.append(SplitGameFileUnswizzleOffset("SamuraiShodown_NGM.sprites.swizzled", [("045-c51.c5", "045-c61.c6")], 1048576, 2097152 * 4))
     all_games.append(samsho_samsho)
     
+    samsho_samsho_aa = Game("Samurai Shodown", conversion_type_arcadearchivesneogeo, "samsho", "samsho")
+    samsho_samsho_aa.compatibility.extend(["Garbled Graphics"])
+    samsho_samsho_aa.files.append(RenameGameFile("m1.bin", "045-m1.m1"))
+    samsho_samsho_aa.files.append(RenameGameFile("s1.bin", "045-s1.s1"))
+    samsho_samsho_aa.files.append(SplitGameFile("v1.bin", ["045-v1.v1", "045-v2.v2"], 2097152))
+    samsho_samsho_aa.files.append(SplitGameFile("p1.bin", ["045-p1.p1","045-pg2.sp2"], 1048576))
+    samsho_samsho_aa.files.append(SplitGameFileSwab("c1.bin", [("045-c1.c1"), ("045-c2.c2"), ("045-c3.c3"), ("045-c4.c4")], 2097152)) #incorrect
+    samsho_samsho_aa.files.append(SplitGameFileSwabOffset("c1.bin", [("045-c51.c5"), ("045-c61.c6")], 1048576, 2097152 * 4)) #incorrect
+    all_games.append(samsho_samsho_aa)
+    
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
     samsho_samsho2.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
     samsho_samsho2.files.append(RenameGameFileOffset(samsho_samsho2.rom_name +".cslot1_audiocpu", "063-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -848,6 +860,66 @@ def get_games():
     samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.japan", ["sp-s3.sp1"], 128 * 1024))
     samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.us", ["usa_2slt.bin"], 128 * 1024))
     all_games.append(samsho_neogeo)
+    
+    segaages_column2j = Game("Columns 2", conversion_type_segaages, "Columns2_jp", "column2j")
+    segaages_column2j.compatibility.extend(["MAME - No Sound"])
+    segaages_column2j.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13361.ic32", "epr-13360.ic31")], 128 * 1024))
+    all_games.append(segaages_column2j)
+    
+    segaages_ichir = Game("Ichidant-R", conversion_type_segaages, "IchidantR_us", "ichir")
+    segaages_ichir.compatibility.extend(["MAME"])
+    segaages_ichir.files.append(SplitGameFileEvenOdd("cpu.bin", [("pa2_32.bin", "pa2_31.bin")], int(0x080000)))
+    segaages_ichir.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
+    segaages_ichir.files.append(RenameGameFile("pcm.bin", "pa2_02.bin"))
+    all_games.append(segaages_ichir)
+    
+    segaages_ichirj = Game("Ichidant-R (Japan)", conversion_type_segaages, "IchidantR_jp", "ichirj")
+    segaages_ichirj.compatibility.extend(["MAME"])
+    segaages_ichirj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-16886.ic32", "epr-16885.ic31")], int(0x080000)))
+    segaages_ichirj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
+    segaages_ichirj.files.append(RenameGameFile("pcm.bin", "epr-16884.ic4"))
+    all_games.append(segaages_ichirj)
+    
+    segaages_puyo = Game("Puyo Puyo", conversion_type_segaages, "PuyoPuyo_us", "puyo")
+    segaages_puyo.compatibility.extend(["MAME - No Sound"])
+    segaages_puyo.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-15198.ic32", "epr-15197.ic31")], int(0x020000)))
+    segaages_puyo.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-15200.ic34", "epr-15199.ic33")], int(0x020000), int(0x100000)))
+    #segaages_puyo.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4")) - Missing
+    all_games.append(segaages_puyo)
+    
+    segaages_puyoj = Game("Puyo Puyo", conversion_type_segaages, "PuyoPuyo_jp", "puyoj")
+    segaages_puyoj.compatibility.extend(["MAME - No Sound"])
+    segaages_puyoj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-15036b.ic32", "epr-15035b.ic31")], int(0x020000)))
+    segaages_puyoj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-15038.ic34", "epr-15037.ic33")], int(0x020000), int(0x100000)))
+    #segaages_puyoj.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4")) - Missing
+    all_games.append(segaages_puyoj)
+    
+    segaages_puyopuy2 = Game("Puyo Puyo 2", conversion_type_segaages, "PuyoPuyo2_jp", "puyopuy2")
+    segaages_puyopuy2.compatibility.extend(["MAME"])
+    segaages_puyopuy2.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-17241.ic32", "epr-17240.ic31")], int(0x080000)))
+    segaages_puyopuy2.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4"))
+    all_games.append(segaages_puyopuy2)
+    
+    segaages_mp_sonic = Game("Sonic The Hedgehog", conversion_type_segaages, "mgp_sonic1", "mp_sonic")
+    segaages_mp_sonic.compatibility.extend(["MAME"])
+    segaages_mp_sonic.files.append(SplitGameFileEvenOdd("cpu.bin", [("ep15177.ic2", "ep15176.ic1")], int(0x040000)))
+    segaages_mp_sonic.files.append(RenameGameFile("data.bin", "ep15175-01.ic3"))
+    segaages_mp_sonic.files.append(RenameGameFile("bios.bin", "mtbios"))
+    all_games.append(segaages_mp_sonic)
+    
+    segaages_tfrceac = Game("Thunder Force AC", conversion_type_segaages, "ThunderForceAC_us", "tfrceac")
+    segaages_tfrceac.compatibility.extend(["MAME"])
+    segaages_tfrceac.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13675.ic32", "epr-13674.ic31")], int(0x040000)))
+    segaages_tfrceac.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-13659.ic34", "epr-13658.ic33")], int(0x040000), int(0x100000)))
+    segaages_tfrceac.files.append(RenameGameFile("pcm.bin", "epr-13655.ic4"))
+    all_games.append(segaages_tfrceac)
+    
+    segaages_tfrceacj = Game("Thunder Force AC (Japan)", conversion_type_segaages, "ThunderForceAC_jp", "tfrceacj")
+    segaages_tfrceacj.compatibility.extend(["MAME but without sound"])
+    segaages_tfrceacj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13657.ic32", "epr-13656.ic31")], int(0x040000)))
+    segaages_tfrceacj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-13659.ic34", "epr-13658.ic33")], int(0x040000), int(0x100000)))
+    segaages_tfrceacj.files.append(RenameGameFile("pcm.bin", "epr-13655.ic4"))
+    all_games.append(segaages_tfrceacj)
     
     return all_games
 
@@ -905,8 +977,10 @@ def join_file_interleave_2(dst_dir, file) :
                         outfile.write(infile1.read(4))
                         outfile.write(infile2.read(4))
                         read += 8
-            os.remove(src_in_1_path)        
-            os.remove(src_in_2_path)           
+                        
+            if debug == False :
+                os.remove(src_in_1_path)        
+                os.remove(src_in_2_path)           
   
 def split_file_evenodd(src_path, dst_dir, file):
     with open(src_path, "rb") as src:
@@ -1200,6 +1274,8 @@ def print_if_debug(msg) :
         print(msg)
 
 def rm_dir(dir):
+    if debug == True :
+        return
     for folderName, subfolders, filenames in os.walk(dir):
         for filename in filenames:
             os.remove(folderName+'/'+filename)
