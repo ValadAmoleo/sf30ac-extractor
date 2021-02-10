@@ -1,6 +1,8 @@
 # sf30ac-extractor
 Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection (ROMs, music, artwork, fonts, etc).
 
+Also converts ROM files from pre-extracted files from the SEGA AGES collection on Switch. Read the [Sega Ages section below](#sega-ages).
+
 ## Requirements
 You need to have a python 3 available somewhere
 
@@ -41,5 +43,23 @@ To convert a specific ROM or a specific collection execute the following and fol
 python split.py 
 ```
 
+### SEGA Ages
+As this tool can not extract games from Switch files or extract from CCF files you will need to do those manually.
+
+Step 1:  Extract the SEGA AGES CCF files from the Switch.  I recommend using [NXDumpTool](https://github.com/DarkMatterCore/nxdumptool).  The CCF files are contained in /system/roms/ of the RomFS section.
+Step 2:  Use CCFEX included on [this post](https://www.smspower.org/forums/post111289#111289) to extract the CCF files.
+Step 3:  Place the files extracted into folders named the same as the CCF file you extracted them from.  E.g. put the files extracted from IchidantR_us into a folder called IchidantR_us.
+Step 4:  Use this sf30ac-extractor tool with the following command:
+```
+python split.py "" "...your rom folder..." --type "segaages"
+```
+
 ## Dependency
 `bplist.py` was stolen by the project [bplist-python](https://github.com/farcaller/bplist-python) with a few alterations to make this work.
+
+## Thanks
+[petmac](https://github.com/petmac) and [WydD](https://github.com/WydD) for their work upstream.
+[ghoost82](https://github.com/ghoost82) for their [CPS1 decoding work](https://github.com/WydD/sf30ac-extractor/issues/2#issuecomment-590633771).
+[reubenajohnston](https://github.com/reubenajohnston) for their research.
+[Vaiski](https://gitlab.com/vaiski) for their extraction work.
+[scrap_a](http://blog.livedoor.jp/scrap_a) for their extraction work.
