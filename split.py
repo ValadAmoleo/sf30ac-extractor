@@ -861,65 +861,111 @@ def get_games():
     samsho_neogeo.files.append(SplitGameFileSwab(samsho_neogeo.rom_name +".mainbios.us", ["usa_2slt.bin"], 128 * 1024))
     all_games.append(samsho_neogeo)
     
-    segaages_column2j = Game("Columns 2", conversion_type_segaages, "Columns2_jp", "column2j")
-    segaages_column2j.compatibility.extend(["MAME - No Sound"])
-    segaages_column2j.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13361.ic32", "epr-13360.ic31")], 128 * 1024))
-    all_games.append(segaages_column2j)
+    
+    segaages_column2j_2003 = Game("Columns 2", conversion_type_segaages, "Columns2_jp", "columns2")
+    segaages_column2j_2003.compatibility.extend(["MAME-2001", "MAME-2003"])
+    segaages_column2j_2003.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr13361.rom", "epr13360.rom")], 128 * 1024))
+    all_games.append(segaages_column2j_2003)
+    
+    segaages_column2j_2004 = Game("Columns 2 (MAME 2004)", conversion_type_segaages, "Columns2_jp", "column2j")
+    segaages_column2j_2004.compatibility.extend(["MAME-2004", "MAME-2005 - Broken", "MAME-2006 - Broken", "MAME-2007 - Broken", "MAME-2008 - Broken", "MAME-2009 - Broken", "MAME-2010 - Broken"])
+    segaages_column2j_2004.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr13361.rom", "epr13360.rom")], 128 * 1024))
+    all_games.append(segaages_column2j_2004)
+    
+    segaages_column2j_2015 = Game("Columns 2 (MAME 2015)", conversion_type_segaages, "Columns2_jp", "column2j-2015")
+    segaages_column2j_2015.compatibility.extend(["MAME-2015 - Broken", "MAME-2016 - Broken", "MAME-2017 - Broken", "MAME-2018 - Broken", "MAME-2019 - Broken"])
+    segaages_column2j_2015.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13361.ic32", "epr-13360.ic31")], 128 * 1024))
+    all_games.append(segaages_column2j_2015)
     
     segaages_ichir = Game("Ichidant-R", conversion_type_segaages, "IchidantR_us", "ichir")
-    segaages_ichir.compatibility.extend(["MAME"])
+    segaages_ichir.compatibility.extend(["MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_ichir.files.append(SplitGameFileEvenOdd("cpu.bin", [("pa2_32.bin", "pa2_31.bin")], int(0x080000)))
     segaages_ichir.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
     segaages_ichir.files.append(RenameGameFile("pcm.bin", "pa2_02.bin"))
     all_games.append(segaages_ichir)
     
+    segaages_ichir_2003 = Game("Ichidant-R (MAME 2003)", conversion_type_segaages, "IchidantR_us", "ichidnte")
+    segaages_ichir_2003.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2004"])
+    segaages_ichir_2003.files.append(SplitGameFileEvenOdd("cpu.bin", [("pa2_32.bin", "pa2_31.bin")], int(0x080000)))
+    segaages_ichir_2003.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
+    segaages_ichir_2003.files.append(RenameGameFile("pcm.bin", "pa2_02.bin"))
+    all_games.append(segaages_ichir_2003)
+    
     segaages_ichirj = Game("Ichidant-R (Japan)", conversion_type_segaages, "IchidantR_jp", "ichirj")
-    segaages_ichirj.compatibility.extend(["MAME"])
+    segaages_ichirj.compatibility.extend(["MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_ichirj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-16886.ic32", "epr-16885.ic31")], int(0x080000)))
     segaages_ichirj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
     segaages_ichirj.files.append(RenameGameFile("pcm.bin", "epr-16884.ic4"))
     all_games.append(segaages_ichirj)
     
+    segaages_ichirj_2003 = Game("Ichidant-R (Japan) (MAME 2003)", conversion_type_segaages, "IchidantR_jp", "ichidant")
+    segaages_ichirj_2003.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2004"])
+    segaages_ichirj_2003.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr16886", "epr16885")], int(0x080000)))
+    segaages_ichirj_2003.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-16888.ic34", "epr-16887.ic33")], int(0x080000), int(0x100000)))
+    segaages_ichirj_2003.files.append(RenameGameFile("pcm.bin", "epr16884"))
+    all_games.append(segaages_ichirj_2003)
+    
+    segaages_ichirj_2005 = Game("Ichidant-R (Japan) (MAME 2005)", conversion_type_segaages, "IchidantR_jp", "ichirj-2005")
+    segaages_ichirj_2005.compatibility.extend(["MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010"])
+    segaages_ichirj_2005.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr16886", "epr16885")], int(0x080000)))
+    segaages_ichirj_2005.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr16888", "epr16887")], int(0x080000), int(0x100000)))
+    segaages_ichirj_2005.files.append(RenameGameFile("pcm.bin", "epr16884"))
+    all_games.append(segaages_ichirj_2005)
+    
     segaages_puyo = Game("Puyo Puyo", conversion_type_segaages, "PuyoPuyo_us", "puyo")
-    segaages_puyo.compatibility.extend(["MAME - No Sound"])
+    segaages_puyo.compatibility.extend(["MAME-2015 Corrupt Graphics", "MAME-2016 Corrupt Graphics", "MAME-2017 Crashes", "MAME-2018 Crashes", "MAME-2019 Corrupt Graphics"])
     segaages_puyo.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-15198.ic32", "epr-15197.ic31")], int(0x020000)))
     segaages_puyo.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-15200.ic34", "epr-15199.ic33")], int(0x020000), int(0x100000)))
-    #segaages_puyo.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4")) - Missing
+    segaages_puyo.files.append(RenameGameFileOffset("cpu.bin", "epr-15196.ic4", 1310719)) # Incorrect file
     all_games.append(segaages_puyo)
     
     segaages_puyoj = Game("Puyo Puyo", conversion_type_segaages, "PuyoPuyo_jp", "puyoj")
-    segaages_puyoj.compatibility.extend(["MAME - No Sound"])
+    segaages_puyoj.compatibility.extend(["MAME-2015 Crashes", "MAME-2016 Crashes", "MAME-2017 Crashes", "MAME-2018 Crashes", "MAME-2019 Crashes"])
     segaages_puyoj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-15036b.ic32", "epr-15035b.ic31")], int(0x020000)))
     segaages_puyoj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-15038.ic34", "epr-15037.ic33")], int(0x020000), int(0x100000)))
-    #segaages_puyoj.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4")) - Missing
+    segaages_puyoj.files.append(RenameGameFileOffset("cpu.bin", "epr-15034.ic4", 1310719)) # Incorrect file
     all_games.append(segaages_puyoj)
     
     segaages_puyopuy2 = Game("Puyo Puyo 2", conversion_type_segaages, "PuyoPuyo2_jp", "puyopuy2")
-    segaages_puyopuy2.compatibility.extend(["MAME"])
+    segaages_puyopuy2.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_puyopuy2.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-17241.ic32", "epr-17240.ic31")], int(0x080000)))
     segaages_puyopuy2.files.append(RenameGameFile("pcm.bin", "epr-17239.ic4"))
     all_games.append(segaages_puyopuy2)
     
     segaages_mp_sonic = Game("Sonic The Hedgehog", conversion_type_segaages, "mgp_sonic1", "mp_sonic")
-    segaages_mp_sonic.compatibility.extend(["MAME"])
+    segaages_mp_sonic.compatibility.extend(["MAME-2005 Corrupt Graphics", "MAME-2006 Corrupt Graphics", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_mp_sonic.files.append(SplitGameFileEvenOdd("cpu.bin", [("ep15177.ic2", "ep15176.ic1")], int(0x040000)))
     segaages_mp_sonic.files.append(RenameGameFile("data.bin", "ep15175-01.ic3"))
     segaages_mp_sonic.files.append(RenameGameFile("bios.bin", "mtbios"))
     all_games.append(segaages_mp_sonic)
     
     segaages_tfrceac = Game("Thunder Force AC", conversion_type_segaages, "ThunderForceAC_us", "tfrceac")
-    segaages_tfrceac.compatibility.extend(["MAME"])
+    segaages_tfrceac.compatibility.extend(["MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_tfrceac.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13675.ic32", "epr-13674.ic31")], int(0x040000)))
     segaages_tfrceac.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-13659.ic34", "epr-13658.ic33")], int(0x040000), int(0x100000)))
     segaages_tfrceac.files.append(RenameGameFile("pcm.bin", "epr-13655.ic4"))
     all_games.append(segaages_tfrceac)
     
+    segaages_tfrceac_mame2003 = Game("Thunder Force AC (MAME 2003)", conversion_type_segaages, "ThunderForceAC_us", "tfrceac-2003")
+    segaages_tfrceac_mame2003.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010"])
+    segaages_tfrceac_mame2003.files.append(SplitGameFileEvenOdd("cpu.bin", [("ic32.bin", "ic31.bin")], int(0x040000)))
+    segaages_tfrceac_mame2003.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("ic34.bin", "ic33.bin")], int(0x040000), int(0x100000)))
+    segaages_tfrceac_mame2003.files.append(RenameGameFile("pcm.bin", "ic4.bin"))
+    all_games.append(segaages_tfrceac_mame2003)
+    
     segaages_tfrceacj = Game("Thunder Force AC (Japan)", conversion_type_segaages, "ThunderForceAC_jp", "tfrceacj")
-    segaages_tfrceacj.compatibility.extend(["MAME but without sound"])
+    segaages_tfrceacj.compatibility.extend(["MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
     segaages_tfrceacj.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr-13657.ic32", "epr-13656.ic31")], int(0x040000)))
     segaages_tfrceacj.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr-13659.ic34", "epr-13658.ic33")], int(0x040000), int(0x100000)))
     segaages_tfrceacj.files.append(RenameGameFile("pcm.bin", "epr-13655.ic4"))
     all_games.append(segaages_tfrceacj)
+    
+    segaages_tfrceacj_mame2003 = Game("Thunder Force AC (Japan) (MAME 2003)", conversion_type_segaages, "ThunderForceAC_jp", "tfrceacj-2003")
+    segaages_tfrceacj_mame2003.compatibility.extend(["MAME-2001", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010"])
+    segaages_tfrceacj_mame2003.files.append(SplitGameFileEvenOdd("cpu.bin", [("epr13657.32", "epr13656.31")], int(0x040000)))
+    segaages_tfrceacj_mame2003.files.append(SplitGameFileEvenOddOffset("cpu.bin", [("epr13659.34", "epr13658.33")], int(0x040000), int(0x100000)))
+    segaages_tfrceacj_mame2003.files.append(RenameGameFile("pcm.bin", "ic4.bin"))
+    all_games.append(segaages_tfrceacj_mame2003)
     
     return all_games
 
