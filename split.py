@@ -2,6 +2,8 @@ import os
 import sys
 import argparse
 import zipfile
+import gzip
+import shutil
 
 def usage(game_list):
     print("Usage: python split.py \"...ExtractionFolder...\" \"...RomFolder...\" --rom \"RomName\" --type \"Collection\"")
@@ -15,7 +17,7 @@ conversion_type_streetfighter30th = "sf30th"
 conversion_type_streetfighterarcade1up = "sfa1up"
 conversion_type_snk40th = "snk40th"
 conversion_type_samuraishowdowncollection = "samsho"
-conversion_type_arcadearchivesneogeo = "aaneogeo"
+conversion_type_acaneogeo = "acaneogeo"
 conversion_type_segaages = "segaages"
 
 debug = None
@@ -817,6 +819,52 @@ def get_games():
     snk40th_powjpnes.files.append(RenameGameFile("POW_jp.nes", "POW Prisoners of War (Japan).nes"))
     all_games.append(snk40th_powjpnes)
     
+    acaneogeo_samshoh = Game("Samurai Shodown", conversion_type_acaneogeo, "ACA NEOGEO SAMURAI SHODOWN v65536 (01005C9002B42800) (UPD)", "samshoh")
+    acaneogeo_samshoh.compatibility.extend(["FB Neo"])
+    acaneogeo_samshoh.files.append(RenameGameFile("m1.bin.gz", "045-m1.m1"))
+    acaneogeo_samshoh.files.append(RenameGameFile("s1.bin.gz", "045-s1.s1"))
+    acaneogeo_samshoh.files.append(SplitGameFile("v1.bin.gz", ["045-v1.v1", "045-v2.v2"], 2097152))
+    acaneogeo_samshoh.files.append(SplitGameFile("p1.bin.gz", ["045-p1.p1"], 1048576))
+    acaneogeo_samshoh.files.append(SplitGameFileOffset("p1.bin.gz", ["045-p2.sp2"], int(0x080000), int(0x100000)))
+    acaneogeo_samshoh.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("045-c1.c1", "045-c2.c2")], int(0x200000)))
+    acaneogeo_samshoh.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("045-c3.c3", "045-c4.c4")], int(0x200000), int(0x400000)))
+    acaneogeo_samshoh.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("045-c5.c5", "045-c6.c6")], int(0x080000), int(0x800000)))
+    all_games.append(acaneogeo_samshoh)
+    
+    acaneogeo_mslug = Game("Metal Slug", conversion_type_acaneogeo, "ACA NEOGEO METAL SLUG v131072 (0100EBE002B3E800) (UPD)", "mslug")
+    acaneogeo_mslug.compatibility.extend(["Broken"])
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c1", "201-c1.c1"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c2", "201-c2.c2"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c3", "201-c3.c3"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c4", "201-c4.c4"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-m1.m1", "201-m1.m1"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-p1.p1", "201-p1.p1"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-s1.s1", "201-s1.s1"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-v1.v1", "201-v1.v1"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-v2.v2", "201-v2.v2"))
+    all_games.append(acaneogeo_mslug)
+    
+    acaneogeo_sonicwi2 = Game("Aero Fighters 2", conversion_type_acaneogeo, "ACA NEOGEO AERO FIGHTERS 2 v65536 (0100AC40038F4800) (UPD)", "sonicwi2")
+    acaneogeo_sonicwi2.compatibility.extend(["Broken"])
+    acaneogeo_sonicwi2.files.append(RenameGameFile("m1.bin.gz", "075-m1.m1"))
+    acaneogeo_sonicwi2.files.append(RenameGameFile("s1.bin.gz", "075-s1.s1"))
+    acaneogeo_sonicwi2.files.append(SplitGameFile("v1.bin.gz", ["075-v1.v1"], int(0x200000)))
+    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("v1.bin.gz", "075-v2.bin", int(0x200000))) #V2 is incorrect
+    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("p1.bin.gz", "075-p1.bin", int(0x100000))) #incorrect
+    acaneogeo_sonicwi2.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("075-c1.c1", "075-c2.c2")], int(0x200000)))
+    acaneogeo_sonicwi2.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("075-c3.c3", "075-c4.c4")], int(0x200000), int(0x400000)))
+    all_games.append(acaneogeo_sonicwi2)
+    
+    acaneogeo_zedblade = Game("Zed Blade", conversion_type_acaneogeo, "ACA NEOGEO ZED BLADE v0 (01005AF004DBC000) (BASE)", "zedblade")
+    acaneogeo_zedblade.compatibility.extend(["FB Neo"])
+    acaneogeo_zedblade.files.append(RenameGameFile("m1.bin.gz", "076-m1.m1"))
+    acaneogeo_zedblade.files.append(RenameGameFile("s1.bin.gz", "076-s1.s1"))
+    acaneogeo_zedblade.files.append(SplitGameFile("v1.bin.gz", ["076-v1.v1", "076-v2.v2", "076-v3.v3"], 2097152))
+    acaneogeo_zedblade.files.append(SplitGameFile("p1.bin.gz", ["076-p1.p1"], int(0x080000)))
+    acaneogeo_zedblade.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("076-c1.c1", "076-c2.c2")], int(0x200000)))
+    acaneogeo_zedblade.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("076-c3.c3", "076-c4.c4")], int(0x200000), int(0x400000)))
+    all_games.append(acaneogeo_zedblade)
+    
     samsho_samsho = Game("Samurai Shodown", conversion_type_samuraishowdowncollection, "Main", "samsho")
     samsho_samsho.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
     samsho_samsho.files.append(RenameGameFileOffset(samsho_samsho.rom_name +".cslot1_audiocpu", "045-m1.m1", (192 * 1024) - (128 * 1024)))
@@ -826,16 +874,6 @@ def get_games():
     samsho_samsho.files.append(SplitGameFileUnswizzle("SamuraiShodown_NGM.sprites.swizzled", [("045-c1.c1", "045-c2.c2"), ("045-c3.c3", "045-c4.c4")], 2097152))
     samsho_samsho.files.append(SplitGameFileUnswizzleOffset("SamuraiShodown_NGM.sprites.swizzled", [("045-c51.c5", "045-c61.c6")], 1048576, 2097152 * 4))
     all_games.append(samsho_samsho)
-    
-    samsho_samsho_aa = Game("Samurai Shodown", conversion_type_arcadearchivesneogeo, "samsho", "samsho")
-    samsho_samsho_aa.compatibility.extend(["Garbled Graphics"])
-    samsho_samsho_aa.files.append(RenameGameFile("m1.bin", "045-m1.m1"))
-    samsho_samsho_aa.files.append(RenameGameFile("s1.bin", "045-s1.s1"))
-    samsho_samsho_aa.files.append(SplitGameFile("v1.bin", ["045-v1.v1", "045-v2.v2"], 2097152))
-    samsho_samsho_aa.files.append(SplitGameFile("p1.bin", ["045-p1.p1","045-pg2.sp2"], 1048576))
-    samsho_samsho_aa.files.append(SplitGameFileSwab("c1.bin", [("045-c1.c1"), ("045-c2.c2"), ("045-c3.c3"), ("045-c4.c4")], 2097152)) #incorrect
-    samsho_samsho_aa.files.append(SplitGameFileSwabOffset("c1.bin", [("045-c51.c5"), ("045-c61.c6")], 1048576, 2097152 * 4)) #incorrect
-    all_games.append(samsho_samsho_aa)
     
     samsho_samsho2 = Game("Samurai Shodown II", conversion_type_samuraishowdowncollection, "Main", "samsho2")
     samsho_samsho2.compatibility.extend(["FB Neo", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MAME-2020"])
@@ -891,7 +929,7 @@ def get_games():
     segaages_column2j = Game("Columns 2 (MAME 2004)", conversion_type_segaages, "Columns2_jp", "column2j")
     segaages_column2j.compatibility.extend(["MAME-2004", "MAME-2005 - Broken", "MAME-2006 - Broken", "MAME-2007 - Broken", "MAME-2008 - Broken", "MAME-2009 - Broken", "MAME-2010 - Broken"])
     segaages_column2j.files.append(segaages_columns2_cpu)
-    all_games.append(segaages_column2j_2004)
+    all_games.append(segaages_column2j)
     
     segaages_column2j_2015 = Game("Columns 2 (MAME 2015)", conversion_type_segaages, "Columns2_jp", "column2j-2015")
     segaages_column2j_2015.compatibility.extend(["MAME-2015 - Broken", "MAME-2016 - Broken", "MAME-2017 - Broken", "MAME-2018 - Broken", "MAME-2019 - Broken"])
@@ -1343,7 +1381,28 @@ def unzip_game(root_dir, game):
     with zipfile.ZipFile(zipname, 'r') as zipObj:
         zipObj.extractall(gamedir)
     print_if_debug(game.extracted_folder_name +".zip has been unzipped to " +gamedir)
-
+    
+def unzip_file(root_dir, game, file):
+    gamedir=root_dir+'/'+game.extracted_folder_name
+    zipname=gamedir+'/'+file.filename
+    if os.path.exists(zipname) == False :
+        print_if_debug("File not found: " +zipname)
+        return False
+    with zipfile.ZipFile(zipname, 'r') as zipObj:
+        zipObj.extractall(gamedir)
+    print_if_debug(file +".zip has been unzipped to " +gamedir)
+    
+def ungzip_file(root_dir, game, file):
+    gamedir=os.path.join(root_dir, game.extracted_folder_name)
+    zipname=gamedir+'/'+file.filename
+    if os.path.exists(zipname) == False :
+        print_if_debug("File not found: " +zipname)
+        return False
+    with gzip.open(zipname, 'rb') as s_file, \
+            open(zipname.replace(".gz", ""), 'wb') as d_file:
+        shutil.copyfileobj(s_file, d_file, 65536)
+    print_if_debug(zipname +" has been unzipped to " +gamedir)
+    
 def print_if_debug(msg) :
     if debug == True :
         print(msg)
@@ -1382,12 +1441,25 @@ def check_overwrite(rom_dir, game, overwrite) :
             
     return True
     
-def check_zip_exists_if_necessary(root_dir, game):
+def check_folderzip_exists_if_necessary(root_dir, game):
     if "zip" in game.extracted_folder_name :
         game.extracted_folder_name = game.extracted_folder_name.replace(".zip", "")
         if unzip_game(root_dir,game) == False :
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
-            return False
+            return False            
+            
+def check_filezip_exists_if_necessary(root_dir, game):
+    for file in game.files:
+        if "zip" in file.filename :
+            if unzip_file(root_dir,game, file) == False:
+                print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
+                return False
+            file.filename = file.filename.replace(".zip", "")
+        if "gz" in file.filename :
+            if ungzip_file(root_dir,game, file) == False:
+                print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  Zip file not found.")
+                return False
+            file.filename = file.filename.replace(".gz", "")
             
 def zip_if_necessary(rom_dir, game):
     if "." not in game.rom_name :
@@ -1398,7 +1470,9 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
         print_if_debug("Overwrite: " +str(overwrite))
         if check_overwrite(rom_dir, game, overwrite) == False :
             continue
-        if check_zip_exists_if_necessary(root_dir, game) == False :
+        if check_folderzip_exists_if_necessary(root_dir, game) == False :
+            continue
+        if check_filezip_exists_if_necessary(root_dir, game) == False :
             continue
         if check_files_exist(root_dir, game) == False:
             print("Unable to extract " +game.name  +" (" +game.contained_within +"). Reason:  One or more files not found.")
