@@ -1,7 +1,9 @@
 # sf30ac-extractor
 Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection (ROMs, music, artwork, fonts, etc).
 
-Also converts ROM files from pre-extracted files from the SEGA AGES collection on Switch. Read the [Sega Ages section below](#sega-ages).
+## Also converts
+* ROM files from pre-extracted files from some SEGA AGES collection games on Switch. Read the [Sega Ages section below](#sega-ages).
+* ROM files from pre-extracted files from some Arcade Archives NEOGEO games on Switch.  Read the [Arcade Archives NEOGEO section below](#arcade-archives-NEOGEO).
 
 ## Requirements
 You need to have a python 3 available somewhere
@@ -56,6 +58,20 @@ Step 4:  Use this sf30ac-extractor tool with the following command:
 ```
 python split.py "" "...your rom folder..." --type "segaages"
 ```
+
+### Arcade Archives NEOGEO
+As this tool can not extract games from Switch files you will need to do those manually.
+
+Step 1:  Extract the RomFS from your chosen Arcade Archives NEOGEO game from the Switch.  I recommend using [NXDumpTool](https://github.com/DarkMatterCore/nxdumptool).
+
+Step 2:  Keep the files in their dumped folder (e.g. ACA NEOGEO ZED BLADE v0 (01005AF004DBC000) (BASE)).
+
+Step 3:  Use this sf30ac-extract tool with the following command:
+```
+python split.py "...your extraction folder..." "...your rom folder..." --type "acaneogeo"
+```
+
+
 
 ## Dependency
 `bplist.py` was stolen by the project [bplist-python](https://github.com/farcaller/bplist-python) with a few alterations to make this work.
