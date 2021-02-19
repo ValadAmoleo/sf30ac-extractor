@@ -2,8 +2,8 @@
 Extract assets from Street Fighter 30th Anniversary Collection, SNK 40th Anniversary Collection and Samurai Shodown Collection (ROMs, music, artwork, fonts, etc).
 
 ## Also converts
-*ROM files from pre-extracted files from some SEGA AGES collection games on Switch. Read the [Sega Ages section below](#sega-ages).
-*ROM files from pre-extracted files from some Arcade Archives NEOGEO games on Switch.  Read the [Arcade Archives NEOGEO section below](#arcade-archives-NEOGEO).
+* ROM files from pre-extracted files from some SEGA AGES collection games on Switch. Read the [Sega Ages section below](#sega-ages).
+* ROM files from pre-extracted files from some Arcade Archives NEOGEO games on Switch.  Read the [Arcade Archives NEOGEO section below](#arcade-archives-NEOGEO).
 
 ## Requirements
 You need to have a python 3 available somewhere
