@@ -50,6 +50,10 @@ class RenameGameFile(RenameGameFileOffset):
     def __init__(self, filename, output_filename):
         super().__init__(filename, output_filename, 0)
         
+class DeleteGameFile(GameFile):
+    def __init__(self, filenames):
+        super().__init__(filenames, "")
+        
 class JoinGameFile(GameFile):
     def __init__(self, filenames, output_filename):
         super().__init__(filenames, output_filename)
@@ -833,12 +837,17 @@ def get_games():
     
     acaneogeo_mslug = Game("Metal Slug", conversion_type_acaneogeo, "ACA NEOGEO METAL SLUG v131072 (0100EBE002B3E800) (UPD)", "mslug")
     acaneogeo_mslug.compatibility.extend(["Broken"])
-    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c1", "201-c1.c1"))
-    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c2", "201-c2.c2"))
-    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c3", "201-c3.c3"))
-    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c4", "201-c4.c4"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c1", "201-ca"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c2", "201-cb"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c3", "201-cc"))
+    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-c1.c4", "201-cd"))
+    acaneogeo_mslug.files.append(JoinGameFile(["201-ca", "201-cb", "201-cc", "201-cd"], "201-c"))
+    acaneogeo_mslug.files.append(SplitGameFileEvenOdd("{rom}/" +acaneogeo_mslug.rom_name +"/201-c", [("201-c1.c1", "201-c2.c2"),("201-c3.c3", "201-c4.c4")], int(0x400000)))
+    acaneogeo_mslug.files.append(DeleteGameFile(["201-c"]))
     acaneogeo_mslug.files.append(RenameGameFile("mslug/201-m1.m1", "201-m1.m1"))
-    acaneogeo_mslug.files.append(RenameGameFile("mslug/201-p1.p1", "201-p1.p1"))
+    acaneogeo_mslug.files.append(RenameGameFileOffset("mslug/201-p1.p1", "201-p1.p1a", int(0x100000)))
+    acaneogeo_mslug.files.append(SplitGameFile("mslug/201-p1.p1", ["201-p1.p1b"], int(0x100000)))
+    acaneogeo_mslug.files.append(JoinGameFile(["201-p1.p1a", "201-p1.p1b"], "201-p1.p1"))
     acaneogeo_mslug.files.append(RenameGameFile("mslug/201-s1.s1", "201-s1.s1"))
     acaneogeo_mslug.files.append(RenameGameFile("mslug/201-v1.v1", "201-v1.v1"))
     acaneogeo_mslug.files.append(RenameGameFile("mslug/201-v2.v2", "201-v2.v2"))
@@ -849,8 +858,10 @@ def get_games():
     acaneogeo_sonicwi2.files.append(RenameGameFile("m1.bin.gz", "075-m1.m1"))
     acaneogeo_sonicwi2.files.append(RenameGameFile("s1.bin.gz", "075-s1.s1"))
     acaneogeo_sonicwi2.files.append(SplitGameFile("v1.bin.gz", ["075-v1.v1"], int(0x200000)))
-    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("v1.bin.gz", "075-v2.bin", int(0x200000))) #V2 is incorrect
-    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("p1.bin.gz", "075-p1.bin", int(0x100000))) #incorrect
+    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("v1.bin.gz", "075-v2.v2", int(0x200000))) #V2 is the incorrect size but seems to work.
+    acaneogeo_sonicwi2.files.append(RenameGameFileOffset("p1.bin.gz", "075-p1.p1a", int(0x100000)))
+    acaneogeo_sonicwi2.files.append(SplitGameFile("p1.bin.gz", ["075-p1.p1b"], int(0x100000)))
+    acaneogeo_sonicwi2.files.append(JoinGameFile(["075-p1.p1a", "075-p1.p1b"], "075-p1.p1"))
     acaneogeo_sonicwi2.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("075-c1.c1", "075-c2.c2")], int(0x200000)))
     acaneogeo_sonicwi2.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("075-c3.c3", "075-c4.c4")], int(0x200000), int(0x400000)))
     all_games.append(acaneogeo_sonicwi2)
@@ -1076,6 +1087,11 @@ def join_file(dst_dir, file) :
             with open(path, "rb") as infile:
                 outfile.write(infile.read())
             os.remove(path) 
+            
+def delete_file(dst_dir, file) :
+    for fname in file.filename :
+        path = os.path.join(dst_dir, fname)
+        os.remove(path) 
 
 def join_file_interleave_2(dst_dir, file) :
     outfilePath = os.path.join(dst_dir, file.output_filenames)
@@ -1417,7 +1433,9 @@ def rm_dir(dir):
         
 def check_files_exist(root_dir, game):
     for file in game.files:
-        if isinstance(file, JoinGameFile) or isinstance(file, JoinGameFileInterleave2) or isinstance(file, DuplicateGameFile):
+        if isinstance(file, JoinGameFile) or isinstance(file, JoinGameFileInterleave2) or isinstance(file, DuplicateGameFile) or isinstance(file, DeleteGameFile):
+            continue
+        if "{rom}" in file.filename :
             continue
         src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
         if os.path.exists(src_path) == False :
@@ -1488,7 +1506,15 @@ def process_game_list(root_dir, game_list, rom_dir, overwrite):
             elif isinstance(file, DuplicateGameFile) :
                 duplicate_file(dst_dir, file)
                 continue
-            src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
+            elif isinstance(file, DeleteGameFile) :
+                delete_file(dst_dir, file)
+                continue
+            
+            if isinstance(file.filename, str) and "{rom}" in file.filename :
+                file.filename = file.filename.replace("{rom}", rom_dir)
+                src_path = file.filename
+            else :
+                src_path = os.path.join(root_dir, game.extracted_folder_name, file.filename)
             if "." not in game.rom_name :
                 dst_dir = os.path.join(rom_dir, game.rom_name)
             else :
