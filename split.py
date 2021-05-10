@@ -907,7 +907,7 @@ def get_games():
     all_games.append(acaneogeo_sonicwi2_2001)
     
     acaneogeo_sonicwi2 = Game("Aero Fighters 2", conversion_type_acaneogeo, "ACA NEOGEO AERO FIGHTERS 2 v65536 (0100AC40038F4800) (UPD)", "sonicwi2")
-    acaneogeo_sonicwi2.compatibility.extend(["FB Neo", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
+    acaneogeo_sonicwi2.compatibility.extend(["FB Neo", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MiSTer (Converted to Neo)"])
     acaneogeo_sonicwi2.files.append(RenameGameFile("m1.bin.gz", "075-m1.m1"))
     acaneogeo_sonicwi2.files.append(RenameGameFile("s1.bin.gz", "075-s1.s1"))
     acaneogeo_sonicwi2.files.append(RenameGameFile("sfix.bin.gz", "sfix.sfx"))
@@ -932,7 +932,7 @@ def get_games():
     all_games.append(acaneogeo_zedblade_2001)
     
     acaneogeo_zedblade = Game("Zed Blade", conversion_type_acaneogeo, "ACA NEOGEO ZED BLADE v0 (01005AF004DBC000) (BASE)", "zedblade")
-    acaneogeo_zedblade.compatibility.extend(["FB Neo", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
+    acaneogeo_zedblade.compatibility.extend(["FB Neo", "MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010", "MAME-2011", "MAME-2012", "MAME-2013", "MAME-2014", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019", "MiSTer (Converted to Neo)"])
     acaneogeo_zedblade.files.append(RenameGameFile("m1.bin.gz", "076-m1.m1"))
     acaneogeo_zedblade.files.append(RenameGameFile("s1.bin.gz", "076-s1.s1"))
     acaneogeo_zedblade.files.append(RenameGameFile("sfix.bin.gz", "sfix.sfx"))
@@ -944,27 +944,39 @@ def get_games():
     
     acaneogeo_pbobble = Game("Puzzle Bobble (MAME 2001)", conversion_type_acaneogeo, "ACA NEOGEO PUZZLE BOBBLE v0 (010049A00C7AA000) (BASE)", "pbobble")
     acaneogeo_pbobble.compatibility.extend(["MAME-2001"])
-    acaneogeo_pbobble.files.append(RenameGameFile("m1.bin.gz", "puzzb_m1.rom"))
-    acaneogeo_pbobble.files.append(RenameGameFile("s1.bin.gz", "ng-sm1.rom"))
-    acaneogeo_pbobble.files.append(RenameGameFile("sfix.bin.gz", "ng-sfix.rom"))
-    acaneogeo_pbobble.files.append(SplitGameFile("v1.bin.gz", ["068-v1.bin", "068-v2.bin", "d96-01.v3"], int(0x100000))) #068-v1.bin and 068-v2.bin are incorrect but unused.
+    acaneogeo_pbobble.files.append(SplitGameFile("m1.bin.gz", ["puzzb_m1.rom"], int(0x010000)))
+    acaneogeo_pbobble.files.append(RenameGameFile("s1.bin.gz", "ng-sm1.rom"))   #Incorrect but works
+    acaneogeo_pbobble.files.append(RenameGameFile("sfix.bin.gz", "ng-sfix.rom")) #Incorrect but works
+    acaneogeo_pbobble.files.append(SplitGameFile("v1.bin.gz", ["068-v1.bin", "068-v2.bin", "d96-01.v3"], int(0x100000)))
     acaneogeo_pbobble.files.append(SplitGameFileOffset("v1.bin.gz", ["d96-05.v4"], int(0x080000), int(0x300000)))
-    acaneogeo_pbobble.files.append(SplitGameFile("p1.bin.gz", ["puzzb_p1.rom"], int(0x080000)))
-    acaneogeo_pbobble.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("068-c1.bin", "068-c2.bin"), ("068-c3.bin", "068-c4.bin")], int(0x100000)))  #Incorrect but unused.
+    acaneogeo_pbobble.files.append(SplitGameFile("p1.bin.gz", ["puzzb_p1.rom"], int(0x040000)))
+    acaneogeo_pbobble.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("068-c1.bin", "068-c2.bin"), ("068-c3.bin", "068-c4.bin")], int(0x100000)))
     acaneogeo_pbobble.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("d96-02.c5", "d96-03.c6")], int(0x080000), int(0x400000)))
     all_games.append(acaneogeo_pbobble)
     
     acaneogeo_pbobblen_2003 = Game("Puzzle Bobble (MAME 2003)", conversion_type_acaneogeo, "ACA NEOGEO PUZZLE BOBBLE v0 (010049A00C7AA000) (BASE)", "pbobblen-2003")
-    acaneogeo_pbobblen_2003.compatibility.extend(["MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007", "MAME-2008", "MAME-2009", "MAME-2010"])
-    acaneogeo_pbobblen_2003.files.append(RenameGameFile("m1.bin.gz", "083-m1.bin"))
-    acaneogeo_pbobblen_2003.files.append(RenameGameFile("s1.bin.gz", "d96-04.s1"))
-    acaneogeo_pbobblen_2003.files.append(RenameGameFile("sfix.bin.gz", "sfix.sfx"))
-    acaneogeo_pbobblen_2003.files.append(SplitGameFile("v1.bin.gz", ["068-v1.bin", "068-v2.bin", "d96-01.v3"], int(0x100000))) #068-v1.bin and 068-v2.bin are incorrect but unused.
+    acaneogeo_pbobblen_2003.compatibility.extend(["MAME-2003", "MAME-2004", "MAME-2005", "MAME-2006", "MAME-2007 (Better to use 2007 version)", "MiSTer (Converted to Neo)"])
+    acaneogeo_pbobblen_2003.files.append(SplitGameFile("m1.bin.gz", ["083-m1.bin"], int(0x010000)))
+    acaneogeo_pbobblen_2003.files.append(RenameGameFile("s1.bin.gz", "d96-s1.bin"))
+    acaneogeo_pbobblen_2003.files.append(RenameGameFile("sfix.bin.gz", "sfix.sfx")) #Incorrect but works
+    acaneogeo_pbobblen_2003.files.append(SplitGameFile("v1.bin.gz", ["068-v1.bin", "068-v2.bin", "d96-01.v3"], int(0x100000)))
     acaneogeo_pbobblen_2003.files.append(SplitGameFileOffset("v1.bin.gz", ["d96-05.v4"], int(0x080000), int(0x300000)))
-    acaneogeo_pbobblen_2003.files.append(SplitGameFile("p1.bin.gz", ["083-p1.bin"], int(0x080000)))
-    acaneogeo_pbobblen_2003.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("068-c1.bin", "068-c2.bin"), ("068-c3.bin", "068-c4.bin")], int(0x100000)))  #Incorrect but unused.
+    acaneogeo_pbobblen_2003.files.append(SplitGameFile("p1.bin.gz", ["083-p1.bin"], int(0x040000)))
+    acaneogeo_pbobblen_2003.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("068-c1.bin", "068-c2.bin"), ("068-c3.bin", "068-c4.bin")], int(0x100000)))
     acaneogeo_pbobblen_2003.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("d96-02.c5", "d96-03.c6")], int(0x080000), int(0x400000)))
     all_games.append(acaneogeo_pbobblen_2003)
+    
+    acaneogeo_pbobblen_2007 = Game("Puzzle Bobble (MAME 2007)", conversion_type_acaneogeo, "ACA NEOGEO PUZZLE BOBBLE v0 (010049A00C7AA000) (BASE)", "pbobblen-2007")
+    acaneogeo_pbobblen_2007.compatibility.extend(["MAME-2003 (Better to use 2003 version)", "MAME-2004 (Better to use 2003 version)", "MAME-2005 (Better to use 2003 version)", "MAME-2006 (Better to use 2003 version)", "MAME-2007", "MiSTer (Converted to Neo)"])
+    acaneogeo_pbobblen_2007.files.append(SplitGameFile("m1.bin.gz", ["083-m1.bin"], int(0x020000)))
+    acaneogeo_pbobblen_2007.files.append(RenameGameFile("s1.bin.gz", "d96-s1.bin"))
+    acaneogeo_pbobblen_2007.files.append(RenameGameFile("sfix.bin.gz", "sfix.sfx")) #Incorrect but works
+    acaneogeo_pbobblen_2007.files.append(SplitGameFile("v1.bin.gz", ["068-v1.bin", "068-v2.bin", "d96-01.v3"], int(0x100000)))
+    acaneogeo_pbobblen_2007.files.append(SplitGameFileOffset("v1.bin.gz", ["d96-05.v4"], int(0x080000), int(0x300000)))
+    acaneogeo_pbobblen_2007.files.append(SplitGameFile("p1.bin.gz", ["083-p1.bin"], int(0x080000)))
+    acaneogeo_pbobblen_2007.files.append(SplitGameFileEvenOdd("c1.bin.gz", [("068-c1.bin", "068-c2.bin"), ("068-c3.bin", "068-c4.bin")], int(0x100000)))
+    acaneogeo_pbobblen_2007.files.append(SplitGameFileEvenOddOffset("c1.bin.gz", [("d96-02.c5", "d96-03.c6")], int(0x080000), int(0x400000)))
+    all_games.append(acaneogeo_pbobblen_2007)
     
     acaneogeo_pbobblen = Game("Puzzle Bobble", conversion_type_acaneogeo, "ACA NEOGEO PUZZLE BOBBLE v0 (010049A00C7AA000) (BASE)", "pbobblen")
     acaneogeo_pbobblen.compatibility.extend(["FB Neo", "MAME-2007", "MAME-2015", "MAME-2016", "MAME-2017", "MAME-2018", "MAME-2019"])
